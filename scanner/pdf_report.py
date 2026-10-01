@@ -10,8 +10,6 @@ from reportlab.platypus import (
     TableStyle
 )
 
-from xml.sax.saxutils import escape
-
 
 # --------------------------------
 # GENERATE PDF REPORT
@@ -25,14 +23,76 @@ def generate_pdf_report(
     cves=None
 ):
 
-    output_file = "exports/security_report.pdf"
+    output_file = (
+        "exports/security_report.pdf"
+    )
 
-    if cves is None:
-        cves = []
+    document = SimpleDocTemplate(
+        output_file,
+        pagesize=A4,
+        rightMargin=40,
+        leftMargin=40,
+        topMargin=40,
+        bottomMargin=40
+    )
+
+    styles = getSampleStyleSheet()
+
+    title_style = styles["Title"]
+    heading_style = styles["Heading2"]
+    normal_style = styles["BodyText"]
+
+    story = []
 
 
     # --------------------------------
-    # CALCULATE SECURITY SUMMARY
+    # TITLE
+    # --------------------------------
+
+    story.append(
+        Paragraph(
+            "Port Scanner Security Report",
+            title_style
+        )
+    )
+
+    story.append(
+        Spacer(
+            1,
+            15
+        )
+    )
+
+
+    # --------------------------------
+    # BASIC INFORMATION
+    # --------------------------------
+
+    story.append(
+        Paragraph(
+            f"<b>Target:</b> {target}",
+            normal_style
+        )
+    )
+
+    story.append(
+        Paragraph(
+            f"<b>Scan Duration:</b> "
+            f"{duration} seconds",
+            normal_style
+        )
+    )
+
+    story.append(
+        Spacer(
+            1,
+            20
+        )
+    )
+
+
+    # --------------------------------
+    # SECURITY SUMMARY
     # --------------------------------
 
     high_count = 0
@@ -59,133 +119,18 @@ def generate_pdf_report(
             low_count += 1
 
 
-    total_ports = len(results)
-
-    total_cves = len(cves)
-
-
-    # --------------------------------
-    # CREATE PDF
-    # --------------------------------
-
-    document = SimpleDocTemplate(
-
-        output_file,
-
-        pagesize=A4,
-
-        rightMargin=35,
-
-        leftMargin=35,
-
-        topMargin=40,
-
-        bottomMargin=40
-
-    )
-
-
-    styles = getSampleStyleSheet()
-
-    title_style = styles["Title"]
-
-    heading_style = styles["Heading2"]
-
-    normal_style = styles["BodyText"]
-
-
-    story = []
-
-
-    # --------------------------------
-    # TITLE
-    # --------------------------------
-
     story.append(
-
         Paragraph(
-
-            "Port Scanner Security Report",
-
-            title_style
-
-        )
-
-    )
-
-    story.append(
-
-        Spacer(
-            1,
-            15
-        )
-
-    )
-
-
-    # --------------------------------
-    # BASIC INFORMATION
-    # --------------------------------
-
-    story.append(
-
-        Paragraph(
-
-            f"<b>Target:</b> "
-            f"{escape(str(target))}",
-
-            normal_style
-
-        )
-
-    )
-
-    story.append(
-
-        Paragraph(
-
-            f"<b>Scan Duration:</b> "
-            f"{duration} seconds",
-
-            normal_style
-
-        )
-
-    )
-
-    story.append(
-
-        Spacer(
-            1,
-            20
-        )
-
-    )
-
-
-    # --------------------------------
-    # SECURITY SUMMARY
-    # --------------------------------
-
-    story.append(
-
-        Paragraph(
-
             "Security Summary",
-
             heading_style
-
         )
-
     )
 
     story.append(
-
         Spacer(
             1,
             10
         )
-
     )
 
 
@@ -203,82 +148,36 @@ def generate_pdf_report(
             str(high_count),
             str(medium_count),
             str(low_count),
-            str(total_ports),
-            str(total_cves)
+            str(len(results)),
+            str(len(cves or []))
         ]
 
     ]
 
 
     summary_table = Table(
-
         summary_data,
-
         colWidths=[
-
-            1.0 * inch,
-
-            1.0 * inch,
-
-            1.0 * inch,
-
-            1.0 * inch,
-
-            1.0 * inch
-
+            0.75 * inch,
+            0.85 * inch,
+            0.75 * inch,
+            0.8 * inch,
+            0.8 * inch
         ]
-
     )
 
 
     summary_table.setStyle(
-
         TableStyle(
-
             [
-
                 (
                     "BACKGROUND",
                     (0, 0),
                     (-1, 0),
-                    colors.HexColor("#eeeeee")
+                    colors.HexColor(
+                        "#eeeeee"
+                    )
                 ),
-
-                (
-                    "FONTNAME",
-                    (0, 0),
-                    (-1, 0),
-                    "Helvetica-Bold"
-                ),
-
-                (
-                    "FONTNAME",
-                    (0, 1),
-                    (-1, 1),
-                    "Helvetica-Bold"
-                ),
-
-                (
-                    "FONTSIZE",
-                    (0, 0),
-                    (-1, -1),
-                    8
-                ),
-
-                (
-                    "ALIGN",
-                    (0, 0),
-                    (-1, -1),
-                    "CENTER"
-                ),
-
-                (
-                    "VALIGN",
-                    (0, 0),
-                    (-1, -1),
-                    "MIDDLE"
-                ),
-
                 (
                     "GRID",
                     (0, 0),
@@ -286,41 +185,38 @@ def generate_pdf_report(
                     0.5,
                     colors.grey
                 ),
-
                 (
-                    "TOPPADDING",
+                    "FONTNAME",
                     (0, 0),
-                    (-1, -1),
-                    8
+                    (-1, 0),
+                    "Helvetica-Bold"
                 ),
-
                 (
-                    "BOTTOMPADDING",
+                    "ALIGN",
                     (0, 0),
                     (-1, -1),
-                    8
+                    "CENTER"
+                ),
+                (
+                    "FONTSIZE",
+                    (0, 0),
+                    (-1, -1),
+                    7
                 )
-
             ]
-
         )
-
     )
 
 
     story.append(
-
         summary_table
-
     )
 
     story.append(
-
         Spacer(
             1,
             25
         )
-
     )
 
 
@@ -329,31 +225,23 @@ def generate_pdf_report(
     # --------------------------------
 
     story.append(
-
         Paragraph(
-
             "Open Ports",
-
             heading_style
-
         )
-
     )
 
     story.append(
-
         Spacer(
             1,
             10
         )
-
     )
 
 
     table_data = [
 
         [
-
             "Port",
             "Protocol",
             "State",
@@ -361,7 +249,6 @@ def generate_pdf_report(
             "Product",
             "Version",
             "Risk"
-
         ]
 
     ]
@@ -435,13 +322,19 @@ def generate_pdf_report(
 
         colWidths=[
 
-            0.50 * inch,
-            0.60 * inch,
             0.55 * inch,
+
+            0.65 * inch,
+
+            0.55 * inch,
+
             0.75 * inch,
-            1.20 * inch,
-            0.80 * inch,
-            0.60 * inch
+
+            1.15 * inch,
+
+            0.85 * inch,
+
+            0.65 * inch
 
         ]
 
@@ -458,7 +351,9 @@ def generate_pdf_report(
                     "BACKGROUND",
                     (0, 0),
                     (-1, 0),
-                    colors.HexColor("#eeeeee")
+                    colors.HexColor(
+                        "#eeeeee"
+                    )
                 ),
 
                 (
@@ -519,18 +414,15 @@ def generate_pdf_report(
 
 
     story.append(
-
         port_table
-
     )
 
-    story.append(
 
+    story.append(
         Spacer(
             1,
             25
         )
-
     )
 
 
@@ -539,24 +431,17 @@ def generate_pdf_report(
     # --------------------------------
 
     story.append(
-
         Paragraph(
-
             "Vulnerability / CVE Lookup",
-
             heading_style
-
         )
-
     )
 
     story.append(
-
         Spacer(
             1,
             10
         )
-
     )
 
 
@@ -594,130 +479,60 @@ def generate_pdf_report(
                 ""
             )
 
-            url = cve.get(
-                "url",
-                ""
-            )
-
-
             story.append(
-
                 Paragraph(
-
-                    f"<b>{escape(str(product))} "
-                    f"{escape(str(version))}</b>",
-
+                    f"<b>{cve_id}</b>",
                     normal_style
-
                 )
-
             )
 
-
             story.append(
-
-                Spacer(
-                    1,
-                    5
-                )
-
-            )
-
-
-            story.append(
-
                 Paragraph(
-
-                    f"<b>{escape(str(cve_id))}</b> "
-                    f"| Severity: "
-                    f"{escape(str(severity))} "
-                    f"| CVSS: "
-                    f"{escape(str(score))}",
-
+                    f"<b>Product:</b> "
+                    f"{product} {version}",
                     normal_style
-
                 )
-
             )
-
 
             story.append(
-
-                Spacer(
-                    1,
-                    5
+                Paragraph(
+                    f"<b>Severity:</b> "
+                    f"{severity} "
+                    f"| <b>CVSS:</b> {score}",
+                    normal_style
                 )
-
             )
-
-
-            if description:
-
-                story.append(
-
-                    Paragraph(
-
-                        escape(
-                            str(description)
-                        ),
-
-                        normal_style
-
-                    )
-
-                )
-
-
-            if url:
-
-                story.append(
-
-                    Spacer(
-                        1,
-                        5
-                    )
-
-                )
-
-                story.append(
-
-                    Paragraph(
-
-                        f'<link href="{escape(str(url))}" '
-                        f'color="blue">'
-                        f'View CVE on NVD'
-                        f'</link>',
-
-                        normal_style
-
-                    )
-
-                )
-
 
             story.append(
-
-                Spacer(
-                    1,
-                    15
+                Paragraph(
+                    description,
+                    normal_style
                 )
-
             )
 
+            story.append(
+                Spacer(
+                    1,
+                    10
+                )
+            )
 
     else:
 
         story.append(
-
             Paragraph(
-
                 "No matching CVEs found.",
-
                 normal_style
-
             )
-
         )
+
+
+    story.append(
+        Spacer(
+            1,
+            20
+        )
+    )
 
 
     # --------------------------------
@@ -725,33 +540,17 @@ def generate_pdf_report(
     # --------------------------------
 
     story.append(
-
-        Spacer(
-            1,
-            10
-        )
-
-    )
-
-    story.append(
-
         Paragraph(
-
             "Security Recommendations",
-
             heading_style
-
         )
-
     )
 
     story.append(
-
         Spacer(
             1,
             10
         )
-
     )
 
 
@@ -760,41 +559,27 @@ def generate_pdf_report(
         for recommendation in recommendations:
 
             story.append(
-
                 Paragraph(
-
-                    f"• "
-                    f"{escape(str(recommendation))}",
-
+                    f"• {recommendation}",
                     normal_style
-
                 )
-
             )
 
             story.append(
-
                 Spacer(
                     1,
                     5
                 )
-
             )
-
 
     else:
 
         story.append(
-
             Paragraph(
-
                 "No specific recommendations "
                 "were generated.",
-
                 normal_style
-
             )
-
         )
 
 
@@ -803,9 +588,7 @@ def generate_pdf_report(
     # --------------------------------
 
     document.build(
-
         story
-
     )
 
 
