@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Port Scanner Security Tool</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+
+</head>
+
+
+<body>
+
+
+<div class="container">
+
+
+    <!-- HEADER -->
+
+    <header class="header">
+
+        <h1>🔐 Port Scanner</h1>
+
+        <p>
+            Network Security Scanning & Analysis Tool
+        </p>
+
+    </header>
+
+
+    <!-- SCAN SECTION -->
+
+    <section class="card">
+
+        <h2>Start Security Scan</h2>
+
+        <p class="description">
+
+            Enter one or more IP addresses or domain names
+            to scan for open ports, services and versions.
+
+        </p>
+
+
+        <form
+            action="/scan"
+            method="POST"
+            onsubmit="showScanningMessage()"
+        >
+
+
+            <label for="target">
+
+                Target IP Address / Domain
+
+            </label>
+
+
+            <textarea
+                id="target"
+                name="target"
+                rows="5"
+                placeholder="Example:
+127.0.0.1
+192.168.1.10
+example.com"
+                required
+            ></textarea>
+
+
+            <p>
+                Enter one target per line.
+            </p>
+
+
+            <button
+                type="submit"
+                id="scanButton"
+            >
+
+                🔍 Start Scan
+
+            </button>
+
+
+            <!-- SCANNING MESSAGE -->
+
+            <p
+                id="scanningMessage"
+                style="display: none;"
+            >
+
+                ⏳ Scanning... Please wait.
+
+            </p>
+
+
+        </form>
+
+    </section>
+
+
+    <!-- FEATURES -->
+
+    <section class="features">
+
+
+        <div class="feature-card">
+
+            <h3>🌐 Port Detection</h3>
+
+            <p>
+
+                Detect open TCP ports on the
+                target system using Nmap.
+
+            </p>
+
+        </div>
+
+
+
+        <div class="feature-card">
+
+            <h3>⚙️ Service Detection</h3>
+
+            <p>
+
+                Identify services, products
+                and their versions.
+
+            </p>
+
+        </div>
+
+
+
+        <div class="feature-card">
+
+            <h3>🛡️ Security Analysis</h3>
+
+            <p>
+
+                Analyze open ports and provide
+                basic security recommendations.
+
+            </p>
+
+        </div>
+
+
+    </section>
+
+
+    <!-- HOW IT WORKS -->
+
+    <section class="card">
+
+        <h2>How It Works</h2>
+
+
+        <ol>
+
+            <li>
+                Enter one or more IP addresses or domains.
+            </li>
+
+            <li>
+                The application validates the targets.
+            </li>
+
+            <li>
+                Nmap performs the security scans.
+            </li>
+
+            <li>
+                Open ports are detected.
+            </li>
+
+            <li>
+                Services and versions are identified.
+            </li>
+
+            <li>
+                Security risks are classified.
+            </li>
+
+            <li>
+                Security recommendations are generated.
+            </li>
+
+        </ol>
+
+    </section>
+
+
+    <!-- SCAN INFORMATION -->
+
+    <section class="card">
+
+        <h2>Scan Information</h2>
+
+
+        <div class="info-grid">
+
+
+            <div>
+
+                <strong>Scanner</strong>
+
+                <p>
+                    Nmap
+                </p>
+
+            </div>
+
+
+
+            <div>
+
+                <strong>Backend</strong>
+
+                <p>
+                    Python + Flask
+                </p>
+
+            </div>
+
+
+
+            <div>
+
+                <strong>Database</strong>
+
+                <p>
+                    SQLite
+                </p>
+
+            </div>
+
+
+
+            <div>
+
+                <strong>Report</strong>
+
+                <p>
+                    HTML Web Report
+                </p>
+
+            </div>
+
+
+        </div>
+
+    </section>
+
+
+    <!-- FOOTER -->
+
+    <footer>
+
+        <p>
+            Port Scanner Security Tool
+        </p>
+
+        <p>
+            Built with Python • Flask • Nmap • SQLite
+        </p>
+
+    </footer>
+
+
+</div>
+
+
+<!-- SCAN LOADING SCRIPT -->
+
+<script>
+
+function showScanningMessage() {
+
+    document.getElementById("scanningMessage").style.display = "block";
+
+
+    document.getElementById("scanButton").disabled = true;
+
+
+    document.getElementById("scanButton").innerText =
+        "⏳ Scanning...";
+
+}
+
+</script>
+
+
+</body>
+
+</html>

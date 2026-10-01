@@ -1,0 +1,229 @@
+body {
+
+    font-family: Arial, sans-serif;
+
+    background: #f4f6f8;
+
+    margin: 0;
+
+    padding: 0;
+
+}
+
+
+.container {
+
+    width: 85%;
+
+    max-width: 1100px;
+
+    margin: 40px auto;
+
+    background: white;
+
+    padding: 30px;
+
+    border-radius: 10px;
+
+    box-shadow: 0 3px 15px rgba(0, 0, 0, 0.1);
+
+}
+
+
+h1 {
+
+    text-align: center;
+
+}
+
+
+h2 {
+
+    margin-top: 30px;
+
+}
+
+
+form {
+
+    margin-top: 30px;
+
+}
+
+
+input {
+
+    width: 95%;
+
+    padding: 12px;
+
+    margin-top: 10px;
+
+    margin-bottom: 15px;
+
+    border: 1px solid #ccc;
+
+    border-radius: 5px;
+
+}
+
+
+button,
+.button,
+.history-button {
+
+    display: inline-block;
+
+    padding: 12px 20px;
+
+    background: #222;
+
+    color: white;
+
+    text-decoration: none;
+
+    border: none;
+
+    border-radius: 5px;
+
+    cursor: pointer;
+
+}
+
+
+button:disabled {
+
+    opacity: 0.7;
+
+    cursor: not-allowed;
+
+}
+
+
+/* --------------------------------
+   SCANNING MESSAGE
+-------------------------------- */
+
+#scanningMessage {
+
+    margin-top: 15px;
+
+    padding: 12px;
+
+    text-align: center;
+
+    font-weight: bold;
+
+    color: #222;
+
+}
+
+
+/* Loading spinner */
+
+#scanningMessage::before {
+
+    content: "";
+
+    display: inline-block;
+
+    width: 14px;
+
+    height: 14px;
+
+    margin-right: 8px;
+
+    border: 3px solid #ccc;
+
+    border-top: 3px solid #222;
+
+    border-radius: 50%;
+
+    vertical-align: middle;
+
+    animation: spin 1s linear infinite;
+
+}
+
+
+/* Spinner animation */
+
+@keyframes spin {
+
+    from {
+
+        transform: rotate(0deg);
+
+    }
+
+    to {
+
+        transform: rotate(360deg);
+
+    }
+
+}
+
+
+/* --------------------------------
+   TABLE
+-------------------------------- */
+
+table {
+
+    width: 100%;
+
+    border-collapse: collapse;
+
+    margin-top: 20px;
+
+}
+
+
+th,
+td {
+
+    padding: 10px;
+
+    border: 1px solid #ddd;
+
+    text-align: left;
+
+}
+
+
+th {
+
+    background: #eeeeee;
+
+}
+
+
+/* --------------------------------
+   ERROR MESSAGE
+-------------------------------- */
+
+.error {
+
+    padding: 12px;
+
+    margin-top: 20px;
+
+    background: #ffe0e0;
+
+    color: #900;
+
+    border-radius: 5px;
+
+}
+
+
+/* --------------------------------
+   LIST
+-------------------------------- */
+
+li {
+
+    margin-bottom: 10px;
+
+}

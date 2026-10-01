@@ -1,0 +1,1059 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Security Scan Report</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+
+
+    <style>
+
+        /* --------------------------------
+           REPORT HEADER
+        -------------------------------- */
+
+        .report-header {
+
+            text-align: center;
+
+            margin-bottom: 30px;
+
+        }
+
+
+        /* --------------------------------
+           SCAN INFORMATION
+        -------------------------------- */
+
+        .scan-info {
+
+            margin-bottom: 25px;
+
+        }
+
+
+        /* --------------------------------
+           RISK
+        -------------------------------- */
+
+        .risk-high {
+
+            font-weight: bold;
+
+        }
+
+
+        .risk-medium {
+
+            font-weight: bold;
+
+        }
+
+
+        .risk-low {
+
+            font-weight: bold;
+
+        }
+
+
+        /* --------------------------------
+           RISK NOTE
+        -------------------------------- */
+
+        .risk-note {
+
+            margin-top: 20px;
+
+            padding: 15px;
+
+            background: #f4f6f8;
+
+            border-radius: 8px;
+
+        }
+
+
+        /* --------------------------------
+           RECOMMENDATIONS
+        -------------------------------- */
+
+        .recommendations {
+
+            margin-top: 30px;
+
+            padding: 20px;
+
+            background: #f4f6f8;
+
+            border-radius: 8px;
+
+        }
+
+
+        .recommendations li {
+
+            margin-bottom: 12px;
+
+        }
+
+
+        /* --------------------------------
+           ACTION BUTTONS
+        -------------------------------- */
+
+        .action-buttons {
+
+            margin-top: 30px;
+
+        }
+
+
+        /* --------------------------------
+           TARGET BADGE
+        -------------------------------- */
+
+        .target-badge {
+
+            display: inline-block;
+
+            padding: 5px 10px;
+
+            background: #eeeeee;
+
+            border-radius: 5px;
+
+            font-weight: bold;
+
+        }
+
+
+        /* --------------------------------
+           CVE SECTION
+        -------------------------------- */
+
+        .cve-section {
+
+            margin-top: 30px;
+
+            padding: 25px;
+
+            background: #fff5f5;
+
+            border: 1px solid #ffcccc;
+
+            border-radius: 10px;
+
+        }
+
+
+        .cve-section h2 {
+
+            margin-top: 0;
+
+        }
+
+
+        .cve-card {
+
+            margin-top: 20px;
+
+            padding: 20px;
+
+            background: white;
+
+            border: 1px solid #dddddd;
+
+            border-radius: 8px;
+
+        }
+
+
+        .cve-header {
+
+            display: flex;
+
+            justify-content: space-between;
+
+            align-items: center;
+
+            flex-wrap: wrap;
+
+            gap: 10px;
+
+        }
+
+
+        .cve-id {
+
+            font-size: 20px;
+
+            font-weight: bold;
+
+        }
+
+
+        .cve-severity {
+
+            display: inline-block;
+
+            padding: 6px 12px;
+
+            border-radius: 5px;
+
+            font-weight: bold;
+
+            background: #eeeeee;
+
+        }
+
+
+        .severity-critical {
+
+            background: #ffcccc;
+
+            color: #990000;
+
+        }
+
+
+        .severity-high {
+
+            background: #ffd6d6;
+
+            color: #aa0000;
+
+        }
+
+
+        .severity-medium {
+
+            background: #ffe6cc;
+
+            color: #994400;
+
+        }
+
+
+        .severity-low {
+
+            background: #ddf5dd;
+
+            color: #176b17;
+
+        }
+
+
+        .severity-unknown {
+
+            background: #eeeeee;
+
+            color: #555555;
+
+        }
+
+
+        .cve-score {
+
+            margin-top: 12px;
+
+            font-weight: bold;
+
+        }
+
+
+        .cve-description {
+
+            margin-top: 15px;
+
+            line-height: 1.6;
+
+        }
+
+
+        .cve-product {
+
+            margin-top: 12px;
+
+            color: #555555;
+
+        }
+
+
+        .cve-link {
+
+            display: inline-block;
+
+            margin-top: 15px;
+
+            padding: 8px 14px;
+
+            background: #222;
+
+            color: white;
+
+            text-decoration: none;
+
+            border-radius: 5px;
+
+        }
+
+
+        .cve-link:hover {
+
+            opacity: 0.85;
+
+        }
+
+
+        .no-cve {
+
+            margin-top: 15px;
+
+            padding: 20px;
+
+            background: #f4f6f8;
+
+            border-radius: 8px;
+
+        }
+
+    <style>
+        
+        <!-- your existing CSS -->
+    
+    /* your existing styles... */
+
+
+    /* --------------------------------
+       SECURITY SUMMARY
+    --------------------------------- */
+
+    .security-summary {
+        margin-bottom: 30px;
+    }
+
+    .security-summary h2 {
+        margin-bottom: 20px;
+    }
+
+    .summary-grid {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 15px;
+    }
+
+    .summary-card {
+        padding: 20px;
+        text-align: center;
+        border-radius: 10px;
+        border: 1px solid #dddddd;
+        background: #f8f8f8;
+    }
+
+    .summary-icon {
+        font-size: 28px;
+    }
+
+    .summary-number {
+        font-size: 30px;
+        font-weight: bold;
+        margin-top: 8px;
+    }
+
+    .summary-label {
+        margin-top: 5px;
+        font-weight: bold;
+    }
+
+    .high-card {
+        background: #fff0f0;
+    }
+
+    .medium-card {
+        background: #fff5e8;
+    }
+
+    .low-card {
+        background: #effbef;
+    }
+
+    .port-card {
+        background: #eef5ff;
+    }
+
+    .cve-card-summary {
+        background: #f5efff;
+    }
+
+    @media (max-width: 900px) {
+        .summary-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    @media (max-width: 500px) {
+        .summary-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
+</style>
+
+</head>
+
+
+<body>
+
+
+<div class="container">
+
+
+    <!-- --------------------------------
+         HEADER
+    --------------------------------- -->
+
+    <div class="report-header">
+
+        <h1>
+            Security Scan Report
+        </h1>
+
+        <p>
+            Network Security Scan Results
+        </p>
+
+    </div>
+
+
+    <!-- --------------------------------
+         SCAN INFORMATION
+    --------------------------------- -->
+
+    <!-- --------------------------------
+     SECURITY SUMMARY
+--------------------------------- -->
+
+<div class="security-summary">
+
+    <h2>
+        🛡️ Security Summary
+    </h2>
+
+    <div class="summary-grid">
+
+        <div class="summary-card high-card">
+            <div class="summary-icon">🔴</div>
+            <div class="summary-number">
+                {{ summary.get("high", 0) }}
+            </div>
+            <div class="summary-label">
+                High Risk
+            </div>
+        </div>
+
+        <div class="summary-card medium-card">
+            <div class="summary-icon">🟠</div>
+            <div class="summary-number">
+                {{ summary.get("medium", 0) }}
+            </div>
+            <div class="summary-label">
+                Medium Risk
+            </div>
+        </div>
+
+        <div class="summary-card low-card">
+            <div class="summary-icon">🟢</div>
+            <div class="summary-number">
+                {{ summary.get("low", 0) }}
+            </div>
+            <div class="summary-label">
+                Low Risk
+            </div>
+        </div>
+
+        <div class="summary-card port-card">
+            <div class="summary-icon">🌐</div>
+            <div class="summary-number">
+                {{ summary.get("ports", 0) }}
+            </div>
+            <div class="summary-label">
+                Open Ports
+            </div>
+        </div>
+
+        <div class="summary-card cve-card-summary">
+            <div class="summary-icon">🔎</div>
+            <div class="summary-number">
+                {{ summary.get("cves", 0) }}
+            </div>
+            <div class="summary-label">
+                CVE Matches
+            </div>
+        </div>
+
+    </div>
+
+</div>
+<div class="scan-info">
+
+        <p>
+
+            <strong>Target(s):</strong>
+
+            {{ target }}
+
+        </p>
+        <p>
+    <strong>Scan Date:</strong>
+
+    {{ scan_date }}
+
+</p>
+
+
+        <p>
+
+            <strong>Scan Duration:</strong>
+
+            {{ duration }} seconds
+
+        </p>
+
+    </div>
+
+
+    <!-- --------------------------------
+         OPEN PORTS
+    --------------------------------- -->
+
+    <h2>
+        Open Ports
+    </h2>
+
+
+    {% if results %}
+
+
+    <table>
+
+        <thead>
+
+            <tr>
+
+                <th>Target</th>
+
+                <th>Port</th>
+
+                <th>Protocol</th>
+
+                <th>State</th>
+
+                <th>Service</th>
+
+                <th>Product</th>
+
+                <th>Version</th>
+
+                <th>Risk</th>
+
+            </tr>
+
+        </thead>
+
+
+        <tbody>
+
+
+            {% for result in results %}
+
+
+            <tr>
+
+
+                <!-- TARGET -->
+
+                <td>
+
+                    <span class="target-badge">
+
+                        {{ result.get("target", target) }}
+
+                    </span>
+
+                </td>
+
+
+                <!-- PORT -->
+
+                <td>
+                    {{ result["port"] }}
+                </td>
+
+
+                <!-- PROTOCOL -->
+
+                <td>
+                    {{ result["protocol"] }}
+                </td>
+
+
+                <!-- STATE -->
+
+                <td>
+                    {{ result["state"] }}
+                </td>
+
+
+                <!-- SERVICE -->
+
+                <td>
+                    {{ result["service"] }}
+                </td>
+
+
+                <!-- PRODUCT -->
+
+                <td>
+                    {{ result["product"] }}
+                </td>
+
+
+                <!-- VERSION -->
+
+                <td>
+                    {{ result["version"] }}
+                </td>
+
+
+                <!-- RISK -->
+
+                <td>
+
+
+                    {% if result["risk"] == "High" %}
+
+                        <span class="risk-high">
+
+                            🔴 High
+
+                        </span>
+
+
+                    {% elif result["risk"] == "Medium" %}
+
+                        <span class="risk-medium">
+
+                            🟠 Medium
+
+                        </span>
+
+
+                    {% else %}
+
+                        <span class="risk-low">
+
+                            🟢 Low
+
+                        </span>
+
+                    {% endif %}
+
+
+                </td>
+
+
+            </tr>
+
+
+            {% endfor %}
+
+
+        </tbody>
+
+    </table>
+
+
+    {% else %}
+
+
+    <div class="card">
+
+        <h3>
+            No Open Ports Detected
+        </h3>
+
+        <p>
+            No open ports were found during the scan.
+        </p>
+
+    </div>
+
+
+    {% endif %}
+
+
+    <!-- --------------------------------
+         RISK CLASSIFICATION
+    --------------------------------- -->
+
+    <div class="risk-note">
+
+        <h3>
+            🛡️ Risk Classification
+        </h3>
+
+
+        <p>
+
+            <strong>🔴 High:</strong>
+
+            Ports or services that commonly require
+            additional security controls.
+
+        </p>
+
+
+        <p>
+
+            <strong>🟠 Medium:</strong>
+
+            Services that should be reviewed and
+            appropriately secured.
+
+        </p>
+
+
+        <p>
+
+            <strong>🟢 Low:</strong>
+
+            Ports that are not classified as high
+            or medium risk by this basic scanner.
+
+        </p>
+
+
+        <p>
+
+            <strong>Note:</strong>
+
+            This classification is a basic
+            project-level assessment. It does not
+            confirm that a system is vulnerable.
+
+        </p>
+
+    </div>
+
+
+    <!-- --------------------------------
+         CVE / VULNERABILITY LOOKUP
+    --------------------------------- -->
+
+    <div class="cve-section">
+
+        <h2>
+            🔎 Vulnerability / CVE Lookup
+        </h2>
+
+
+        <p>
+
+            Possible vulnerabilities identified
+            from the detected product and version.
+
+        </p>
+
+
+        {% if vulnerabilities %}
+
+
+            {% for vulnerability in vulnerabilities %}
+
+
+            <div class="cve-card">
+
+
+                <!-- CVE HEADER -->
+
+                <div class="cve-header">
+
+
+                    <span class="cve-id">
+
+                        {{ vulnerability["id"] }}
+
+                    </span>
+
+
+                    {% set severity =
+                        vulnerability["severity"] | default("Unknown") | upper
+                    %}
+
+
+                    {% if severity == "CRITICAL" %}
+
+                        <span class="cve-severity severity-critical">
+
+                            🔴 Critical
+
+                        </span>
+
+
+                    {% elif severity == "HIGH" %}
+
+                        <span class="cve-severity severity-high">
+
+                            🔴 High
+
+                        </span>
+
+
+                    {% elif severity == "MEDIUM" %}
+
+                        <span class="cve-severity severity-medium">
+
+                            🟠 Medium
+
+                        </span>
+
+
+                    {% elif severity == "LOW" %}
+
+                        <span class="cve-severity severity-low">
+
+                            🟢 Low
+
+                        </span>
+
+
+                    {% else %}
+
+                        <span class="cve-severity severity-unknown">
+
+                            ⚪ Unknown
+
+                        </span>
+
+                    {% endif %}
+
+
+                </div>
+
+
+                <!-- PRODUCT -->
+
+                {% if vulnerability.get("product") %}
+
+                <p class="cve-product">
+
+                    <strong>Product:</strong>
+
+                    {{ vulnerability["product"] }}
+
+
+                    {% if vulnerability.get("version") %}
+
+                        {{ vulnerability["version"] }}
+
+                    {% endif %}
+
+                </p>
+
+                {% endif %}
+
+
+                <!-- SCORE -->
+
+                <p class="cve-score">
+
+                    <strong>CVSS Score:</strong>
+
+                    {% if vulnerability.get("score") is not none %}
+
+                        {{ vulnerability["score"] }}
+
+                    {% else %}
+
+                        Not available
+
+                    {% endif %}
+
+                </p>
+
+
+                <!-- DESCRIPTION -->
+
+                <div class="cve-description">
+
+                    <strong>Description:</strong>
+
+
+                    <p>
+
+                        {{ vulnerability.get(
+                            "description",
+                            "No description available."
+                        ) }}
+
+                    </p>
+
+                </div>
+
+
+                <!-- NVD LINK -->
+
+                <a
+
+                    href="https://nvd.nist.gov/vuln/detail/{{ vulnerability['id'] }}"
+
+                    target="_blank"
+
+                    class="cve-link"
+
+                >
+
+                    🔗 View on NVD
+
+                </a>
+
+
+            </div>
+
+
+            {% endfor %}
+
+
+        {% else %}
+
+
+            <div class="no-cve">
+
+                <h3>
+                    No matching CVEs found.
+                </h3>
+
+
+                <p>
+
+                    No matching vulnerability information
+                    was returned for the detected products.
+
+                </p>
+
+            </div>
+
+
+        {% endif %}
+
+
+        <p>
+
+            <strong>Note:</strong>
+
+            CVE matches are possible matches based on
+            detected product and version information.
+            They do not confirm that the scanned system
+            is vulnerable.
+
+        </p>
+
+    </div>
+
+
+    <!-- --------------------------------
+         SECURITY RECOMMENDATIONS
+    --------------------------------- -->
+
+    <div class="recommendations">
+
+        <h2>
+            🛡️ Security Recommendations
+        </h2>
+
+
+        {% if recommendations %}
+
+
+        <ul>
+
+            {% for recommendation in recommendations %}
+
+            <li>
+
+                {{ recommendation }}
+
+            </li>
+
+            {% endfor %}
+
+        </ul>
+
+
+        {% else %}
+
+
+        <p>
+            No specific recommendations were generated.
+        </p>
+
+
+        {% endif %}
+
+
+    </div>
+
+
+    <!-- --------------------------------
+         ACTION BUTTONS
+    --------------------------------- -->
+
+    <div class="action-buttons">
+
+
+        <a href="/" class="button">
+
+            🔍 Start New Scan
+
+        </a>
+
+
+        <a href="/history" class="button">
+
+            📋 Scan History
+
+        </a>
+
+
+        <a href="/dashboard" class="button">
+
+            🛡️ Dashboard
+
+        </a>
+
+
+        <a href="/download-pdf" class="button">
+
+            📄 Download PDF Report
+
+        </a>
+
+
+    </div>
+
+
+</div>
+
+
+</body>
+
+</html>
