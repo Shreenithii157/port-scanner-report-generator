@@ -1,67 +1,60 @@
-<!DOCTYPE html>
-<html lang="en">
+{% extends "base.html" %}
 
-<head>
+{% block title %}New Scan | Sentinel Security{% endblock %}
 
-    <meta charset="UTF-8">
+{% block content %}
 
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
+<div class="page-header">
 
-    <title>Port Scanner Security Tool</title>
-
-    <link rel="stylesheet"
-          href="{{ url_for('static', filename='style.css') }}">
-
-</head>
-
-
-<body>
-
-
-<div class="container">
-
-
-    <!-- HEADER -->
-
-    <header class="header">
-
-        <h1>🔐 Port Scanner</h1>
+    <div>
+        <h1>New Security Scan</h1>
 
         <p>
-            Network Security Scanning & Analysis Tool
+            Perform an authorized network security assessment using Nmap.
         </p>
+    </div>
 
-    </header>
-
-
-    <!-- SCAN SECTION -->
-
-    <section class="card">
-
-        <h2>Start Security Scan</h2>
-
-        <p class="description">
-
-            Enter one or more IP addresses or domain names
-            to scan for open ports, services and versions.
-
-        </p>
+</div>
 
 
-        <form
-            action="/scan"
-            method="POST"
-            onsubmit="showScanningMessage()"
-        >
+<!-- =====================================================
+     SCAN FORM
+     ===================================================== -->
 
+<div class="dashboard-panel">
+
+    <div class="panel-header">
+
+        <div>
+            <h2>Start Security Assessment</h2>
+
+            <p>
+                Enter one or more authorized IP addresses or domain names
+                and select the type of scan you want to perform.
+            </p>
+        </div>
+
+        <span class="panel-status">
+            ● READY
+        </span>
+
+    </div>
+
+
+    <form
+        action="{{ url_for('scan') }}"
+        method="POST"
+        onsubmit="showScanningMessage()"
+    >
+
+
+        <!-- TARGET -->
+
+        <div class="form-group">
 
             <label for="target">
-
                 Target IP Address / Domain
-
             </label>
-
 
             <textarea
                 id="target"
@@ -74,233 +67,561 @@ example.com"
                 required
             ></textarea>
 
+            <div class="dashboard-note">
 
-            <p>
-                Enter one target per line.
-            </p>
+                <strong>Tip:</strong>
 
+                Enter one target per line to scan multiple
+                authorized systems.
+
+            </div>
+
+        </div>
+
+
+        <!-- SCAN TYPE -->
+
+        <div class="form-group">
+
+            <label for="scan_type">
+                Scan Type
+            </label>
+
+            <select
+                id="scan_type"
+                name="scan_type"
+                required
+            >
+
+                <option value="service" selected>
+                    Service Detection — Recommended
+                </option>
+
+                <option value="tcp">
+                    TCP Connect Scan
+                </option>
+
+                <option value="syn">
+                    SYN Scan
+                </option>
+
+                <option value="udp">
+                    UDP Scan
+                </option>
+
+                <option value="tcp_udp">
+                    TCP + UDP Scan
+                </option>
+
+                <option value="os">
+                    OS Detection
+                </option>
+
+                <option value="aggressive">
+                    Aggressive Scan
+                </option>
+
+                <option value="ping">
+                    Ping / Host Discovery
+                </option>
+
+            </select>
+
+        </div>
+
+
+        <!-- SCAN INFORMATION -->
+
+        <div class="dashboard-main-grid">
+
+
+            <div class="dashboard-panel">
+
+                <div class="panel-header">
+
+                    <div>
+
+                        <h2>Assessment Information</h2>
+
+                        <p>
+                            Select a scan according to your assessment goal.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <div class="overview-list">
+
+
+                    <div class="overview-row">
+
+                        <div class="overview-left">
+
+                            <span class="overview-icon">
+                                ◈
+                            </span>
+
+                            <div>
+
+                                <strong>
+                                    TCP Connect
+                                </strong>
+
+                                <small>
+                                    Basic TCP connection scanning.
+                                </small>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="overview-row">
+
+                        <div class="overview-left">
+
+                            <span class="overview-icon">
+                                ◎
+                            </span>
+
+                            <div>
+
+                                <strong>
+                                    UDP Scan
+                                </strong>
+
+                                <small>
+                                    Checks UDP services.
+                                </small>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="overview-row">
+
+                        <div class="overview-left">
+
+                            <span class="overview-icon">
+                                ⚙
+                            </span>
+
+                            <div>
+
+                                <strong>
+                                    Service Detection
+                                </strong>
+
+                                <small>
+                                    Detects services, products and versions.
+                                </small>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="overview-row">
+
+                        <div class="overview-left">
+
+                            <span class="overview-icon">
+                                ◉
+                            </span>
+
+                            <div>
+
+                                <strong>
+                                    OS Detection
+                                </strong>
+
+                                <small>
+                                    Attempts to identify the target operating system.
+                                </small>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                </div>
+
+            </div>
+
+
+            <!-- SECURITY NOTICE -->
+
+            <div class="dashboard-panel">
+
+                <div class="panel-header">
+
+                    <div>
+
+                        <h2>Security Notice</h2>
+
+                        <p>
+                            Use this scanner responsibly.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <div class="dashboard-note">
+
+                    <strong>Authorized Use Only</strong>
+
+                    <br><br>
+
+                    Scan only systems and networks that you own
+                    or have explicit permission to assess.
+
+                </div>
+
+
+                <div class="overview-list">
+
+                    <div class="overview-row">
+
+                        <div class="overview-left">
+
+                            <span class="overview-icon">
+                                ✓
+                            </span>
+
+                            <div>
+
+                                <strong>
+                                    Nmap Engine
+                                </strong>
+
+                                <small>
+                                    Network scanning backend
+                                </small>
+
+                            </div>
+
+                        </div>
+
+                        <span class="status-badge success">
+                            Ready
+                        </span>
+
+                    </div>
+
+
+                    <div class="overview-row">
+
+                        <div class="overview-left">
+
+                            <span class="overview-icon">
+                                ✓
+                            </span>
+
+                            <div>
+
+                                <strong>
+                                    Report Generator
+                                </strong>
+
+                                <small>
+                                    HTML and PDF reports
+                                </small>
+
+                            </div>
+
+                        </div>
+
+                        <span class="status-badge success">
+                            Ready
+                        </span>
+
+                    </div>
+
+
+                    <div class="overview-row">
+
+                        <div class="overview-left">
+
+                            <span class="overview-icon">
+                                ✓
+                            </span>
+
+                            <div>
+
+                                <strong>
+                                    CVE Intelligence
+                                </strong>
+
+                                <small>
+                                    NVD vulnerability lookup
+                                </small>
+
+                            </div>
+
+                        </div>
+
+                        <span class="status-badge success">
+                            Ready
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+        </div>
+
+
+        <!-- START BUTTON -->
+<div style="
+    margin-top:30px;
+    padding-top:22px;
+    border-top:1px solid #243247;
+">
+
+    <div style="
+        display:flex;
+        justify-content:space-between;
+        align-items:center;
+        gap:20px;
+        flex-wrap:wrap;
+    ">
+
+        <!-- ACTION INFORMATION -->
+        <div style="flex:1; min-width:260px;">
+            <div style="
+                color:#e2e8f0;
+                font-size:14px;
+                font-weight:600;
+                margin-bottom:5px;
+            ">
+                Ready to begin?
+            </div>
+
+            <div style="
+                color:#8ea2bd;
+                font-size:13px;
+                line-height:1.5;
+            ">
+                Review your target and scan type, then start the security assessment.
+            </div>
+        </div>
+
+        <!-- ACTION BUTTONS -->
+        <div style="
+            display:flex;
+            align-items:center;
+            gap:12px;
+            flex-shrink:0;
+        ">
+
+            <a
+                href="{{ url_for('dashboard') }}"
+                class="logout-link"
+                style="
+                    border:1px solid #243247;
+                    color:#8ea2bd;
+                    text-decoration:none;
+                    padding:11px 18px;
+                    border-radius:8px;
+                    display:inline-flex;
+                    align-items:center;
+                    justify-content:center;
+                    min-width:90px;
+                "
+            >
+                Cancel
+            </a>
 
             <button
                 type="submit"
                 id="scanButton"
+                class="button"
+                style="
+                    border:none;
+                    cursor:pointer;
+                    min-width:190px;
+                    padding:12px 22px;
+                    border-radius:8px;
+                    font-weight:600;
+                "
             >
-
-                🔍 Start Scan
-
+                🔎 Start Security Scan
             </button>
 
-
-            <!-- SCANNING MESSAGE -->
-
-            <p
-                id="scanningMessage"
-                style="display: none;"
-            >
-
-                ⏳ Scanning... Please wait.
-
-            </p>
-
-
-        </form>
-
-    </section>
-
-
-    <!-- FEATURES -->
-
-    <section class="features">
-
-
-        <div class="feature-card">
-
-            <h3>🌐 Port Detection</h3>
-
-            <p>
-
-                Detect open TCP ports on the
-                target system using Nmap.
-
-            </p>
-
         </div>
 
+    </div>
 
+</div>
 
-        <div class="feature-card">
+<!-- SCANNING MESSAGE -->
+<div
+    id="scanningMessage"
+    class="alert alert-success"
+    style="display:none; margin-top:20px;"
+>
+    <div style="
+        display:flex;
+        align-items:flex-start;
+        gap:12px;
+    ">
 
-            <h3>⚙️ Service Detection</h3>
-
-            <p>
-
-                Identify services, products
-                and their versions.
-
-            </p>
-
+        <div style="font-size:20px;">
+            ⏳
         </div>
 
+        <div>
+            <strong>
+                Scan in progress...
+            </strong>
 
-
-        <div class="feature-card">
-
-            <h3>🛡️ Security Analysis</h3>
-
-            <p>
-
-                Analyze open ports and provide
-                basic security recommendations.
-
-            </p>
-
+            <div style="
+                margin-top:5px;
+                color:#8ea2bd;
+            ">
+                Please wait while Nmap performs the security assessment.
+            </div>
         </div>
 
+    </div>
+</div>
 
-    </section>
-
-
-    <!-- HOW IT WORKS -->
-
-    <section class="card">
-
-        <h2>How It Works</h2>
-
-
-        <ol>
-
-            <li>
-                Enter one or more IP addresses or domains.
-            </li>
-
-            <li>
-                The application validates the targets.
-            </li>
-
-            <li>
-                Nmap performs the security scans.
-            </li>
-
-            <li>
-                Open ports are detected.
-            </li>
-
-            <li>
-                Services and versions are identified.
-            </li>
-
-            <li>
-                Security risks are classified.
-            </li>
-
-            <li>
-                Security recommendations are generated.
-            </li>
-
-        </ol>
-
-    </section>
-
-
-    <!-- SCAN INFORMATION -->
-
-    <section class="card">
-
-        <h2>Scan Information</h2>
-
-
-        <div class="info-grid">
-
-
-            <div>
-
-                <strong>Scanner</strong>
-
-                <p>
-                    Nmap
-                </p>
-
-            </div>
-
-
-
-            <div>
-
-                <strong>Backend</strong>
-
-                <p>
-                    Python + Flask
-                </p>
-
-            </div>
-
-
-
-            <div>
-
-                <strong>Database</strong>
-
-                <p>
-                    SQLite
-                </p>
-
-            </div>
-
-
-
-            <div>
-
-                <strong>Report</strong>
-
-                <p>
-                    HTML Web Report
-                </p>
-
-            </div>
-
-
-        </div>
-
-    </section>
-
-
-    <!-- FOOTER -->
-
-    <footer>
-
-        <p>
-            Port Scanner Security Tool
-        </p>
-
-        <p>
-            Built with Python • Flask • Nmap • SQLite
-        </p>
-
-    </footer>
-
+</form>
 
 </div>
 
 
-<!-- SCAN LOADING SCRIPT -->
+<!-- =====================================================
+     FEATURES
+     ===================================================== -->
+
+<div class="dashboard-panel" style="margin-top:20px;">
+
+    <div class="panel-header">
+
+        <div>
+
+            <h2>Scanner Capabilities</h2>
+
+            <p>
+                Security assessment features available in Sentinel.
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <div class="info-grid">
+
+
+        <div class="info-item">
+
+            <span class="info-number">
+                Nmap
+            </span>
+
+            <span class="info-title">
+                Network Scanning
+            </span>
+
+            <span class="info-text">
+                Automated network and service discovery.
+            </span>
+
+        </div>
+
+
+        <div class="info-item">
+
+            <span class="info-number">
+                CVE
+            </span>
+
+            <span class="info-title">
+                Vulnerability Intelligence
+            </span>
+
+            <span class="info-text">
+                Possible vulnerability matches using detected products
+                and versions.
+            </span>
+
+        </div>
+
+
+        <div class="info-item">
+
+            <span class="info-number">
+                PDF
+            </span>
+
+            <span class="info-title">
+                Security Reporting
+            </span>
+
+            <span class="info-text">
+                Generate downloadable security assessment reports.
+            </span>
+
+        </div>
+
+
+    </div>
+
+</div>
+
+
+{% endblock %}
+
+
+{% block scripts %}
 
 <script>
 
 function showScanningMessage() {
 
-    document.getElementById("scanningMessage").style.display = "block";
+    const message =
+        document.getElementById("scanningMessage");
+
+    const button =
+        document.getElementById("scanButton");
 
 
-    document.getElementById("scanButton").disabled = true;
+    message.style.display = "block";
 
 
-    document.getElementById("scanButton").innerText =
+    button.disabled = true;
+
+    button.style.opacity = "0.65";
+
+    button.style.cursor = "not-allowed";
+
+
+    button.innerText =
         "⏳ Scanning...";
+
+
+    return true;
 
 }
 
 </script>
 
-
-</body>
-
-</html>
+{% endblock %}

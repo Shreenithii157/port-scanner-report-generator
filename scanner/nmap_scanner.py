@@ -1,47 +1,53 @@
 import nmap
 import time
 
-from scanner.risk import get_port_risk
 
+def scan_target(target, scan_type="service"):
+    """
+    Run an Nmap scan using the selected scan type.
 
-# --------------------------------
-# NMAP SCAN
-# --------------------------------
-
-def scan_target(target):
+    Supported scan types:
+        tcp
+        syn
+        udp
+        tcp_udp
+        service
+        os
+        aggressive
+        ping
+    """
 
     scanner = nmap.PortScanner()
 
+    scan_arguments = {
+        "tcp": "-sT",
+        "syn": "-sS",
+        "udp": "-sU",
+        "tcp_udp": "-sT -sU",
+        "service": "-sT -sV",
+        "os": "-sT -O",
+        "aggressive": "-A",
+        "ping": "-sn"
+    }
 
-    # Start timer
+    arguments = scan_arguments.get(
+        scan_type,
+        "-sT -sV"
+    )
 
     start_time = time.time()
 
-
-    # Run Nmap service detection
-
     scanner.scan(
         target,
-        arguments="-sV"
+        arguments=arguments
     )
-
-
-    # Calculate scan duration
 
     duration = round(
         time.time() - start_time,
         2
     )
 
-
-    # Store results
-
     results = []
-
-
-    # --------------------------------
-    # PROCESS SCAN RESULTS
-    # --------------------------------
 
     for host in scanner.all_hosts():
 
@@ -49,58 +55,29 @@ def scan_target(target):
 
             ports = scanner[host][protocol].keys()
 
-
             for port in sorted(ports):
 
                 service = scanner[host][protocol][port]
 
-
-                # Get service name
-
-                service_name = service.get(
-                    "name",
-                    "unknown"
-                )
-
-
-                # Get risk level
-
-                risk = get_port_risk(
-                    port,
-                    service_name
-                )
-
-
-                # Add result
-
                 results.append({
-
                     "port": port,
-
                     "protocol": protocol,
-
                     "state": service.get(
                         "state",
                         ""
                     ),
-
-                    "service": service_name,
-
+                    "service": service.get(
+                        "name",
+                        "unknown"
+                    ),
                     "product": service.get(
                         "product",
                         ""
                     ),
-
                     "version": service.get(
                         "version",
                         ""
-                    ),
-
-                    "risk": risk
-
+                    )
                 })
-
-
-    # Return scan results
 
     return results, duration

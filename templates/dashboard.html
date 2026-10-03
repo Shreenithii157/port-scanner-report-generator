@@ -1,365 +1,618 @@
-<!DOCTYPE html>
-<html lang="en">
+{% extends "base.html" %}
 
-<head>
+{% block title %}Dashboard | Sentinel Security{% endblock %}
 
-    <meta charset="UTF-8">
+{% block content %}
 
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
+<style>
+    /* =========================================================
+       DASHBOARD FINAL LAYOUT FIX
+       Keeps all dashboard content safely inside the cards.
+       ========================================================= */
 
-    <title>Security Dashboard</title>
+    .sentinel-dashboard {
+        width: 100%;
+        box-sizing: border-box;
+    }
 
-    <link rel="stylesheet"
-          href="{{ url_for('static', filename='style.css') }}">
+    .sentinel-dashboard .dashboard-hero {
+        margin-bottom: 28px;
+    }
 
-    <style>
+    .sentinel-dashboard .dashboard-hero h1 {
+        margin: 0 0 8px 0;
+    }
 
-        .dashboard-header {
+    .sentinel-dashboard .dashboard-hero p {
+        margin: 0;
+    }
 
-            text-align: center;
+    /* Statistics */
 
-            margin-bottom: 35px;
+    .sentinel-dashboard .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 18px;
+        margin-bottom: 28px;
+    }
 
+    .sentinel-dashboard .stat-card {
+        box-sizing: border-box;
+        padding: 24px;
+        min-width: 0;
+    }
+
+    .sentinel-dashboard .stat-card h3 {
+        margin: 0 0 10px 0;
+    }
+
+    .sentinel-dashboard .stat-card .stat-value {
+        margin: 0;
+    }
+
+    /* Every major dashboard panel */
+
+    .sentinel-dashboard .dashboard-panel {
+        box-sizing: border-box;
+        width: 100%;
+        margin-bottom: 28px;
+        overflow: hidden;
+    }
+
+    /* Header of every panel */
+
+    .sentinel-dashboard .dashboard-panel .panel-header {
+        box-sizing: border-box;
+        padding: 26px 28px !important;
+    }
+
+    .sentinel-dashboard .dashboard-panel .panel-header h2,
+    .sentinel-dashboard .dashboard-panel .panel-header h3 {
+        margin: 0 0 8px 0;
+    }
+
+    .sentinel-dashboard .dashboard-panel .panel-header p {
+        margin: 0;
+    }
+
+    /*
+       IMPORTANT:
+       This is the actual fix.
+
+       All content AFTER the panel header gets its own
+       padded container.
+    */
+
+    .sentinel-dashboard .panel-body {
+        box-sizing: border-box;
+        width: 100%;
+        padding: 28px !important;
+    }
+
+    /* Security Overview */
+
+    .sentinel-dashboard .overview-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 18px;
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .sentinel-dashboard .overview-item {
+        box-sizing: border-box;
+        min-width: 0;
+        padding: 22px;
+        border: 1px solid rgba(255,255,255,0.08);
+        border-radius: 14px;
+        background: rgba(255,255,255,0.02);
+    }
+
+    .sentinel-dashboard .overview-item h3 {
+        margin: 0 0 8px 0;
+    }
+
+    .sentinel-dashboard .overview-item p {
+        margin: 0;
+        line-height: 1.6;
+    }
+
+    /* Quick Actions */
+
+    .sentinel-dashboard .quick-actions {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 16px;
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .sentinel-dashboard .quick-action {
+        box-sizing: border-box;
+        min-width: 0;
+        padding: 20px 22px;
+        border: 1px solid rgba(255,255,255,0.08);
+        border-radius: 14px;
+        background: rgba(255,255,255,0.02);
+    }
+
+    .sentinel-dashboard .quick-action a {
+        display: block;
+        text-decoration: none;
+    }
+
+    .sentinel-dashboard .quick-action-title {
+        display: block;
+        margin-bottom: 6px;
+        font-weight: 700;
+    }
+
+    .sentinel-dashboard .quick-action-description {
+        display: block;
+        line-height: 1.5;
+    }
+
+    /* System Status */
+
+    .sentinel-dashboard .system-status-list {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 14px;
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .sentinel-dashboard .system-status-item {
+        box-sizing: border-box;
+        min-width: 0;
+        padding: 18px 20px;
+        border: 1px solid rgba(255,255,255,0.08);
+        border-radius: 12px;
+        background: rgba(255,255,255,0.02);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 15px;
+    }
+
+    .sentinel-dashboard .system-status-name {
+        font-weight: 700;
+    }
+
+    .sentinel-dashboard .system-status-state {
+        white-space: nowrap;
+    }
+
+    /* Status badge */
+
+    .sentinel-dashboard .ready-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 7px 12px;
+        border-radius: 999px;
+        font-size: 13px;
+        font-weight: 700;
+        background: rgba(0, 255, 180, 0.10);
+        color: #00e6b0;
+    }
+
+    /* Mobile */
+
+    @media (max-width: 900px) {
+
+        .sentinel-dashboard .stats-grid {
+            grid-template-columns: 1fr;
         }
 
-
-        .dashboard-header h1 {
-
-            margin-bottom: 10px;
-
+        .sentinel-dashboard .overview-grid {
+            grid-template-columns: 1fr;
         }
 
-
-        .dashboard-header p {
-
-            color: #666;
-
+        .sentinel-dashboard .quick-actions {
+            grid-template-columns: 1fr;
         }
 
+        .sentinel-dashboard .system-status-list {
+            grid-template-columns: 1fr;
+        }
+    }
 
-        .dashboard-grid {
+    @media (max-width: 600px) {
 
-            display: grid;
-
-            grid-template-columns:
-                repeat(2, 1fr);
-
-            gap: 20px;
-
-            margin-top: 30px;
-
+        .sentinel-dashboard .dashboard-panel .panel-header {
+            padding: 22px !important;
         }
 
-
-        .dashboard-card {
-
-            padding: 25px;
-
-            background: #f4f6f8;
-
-            border-radius: 10px;
-
-            text-align: center;
-
-            border: 1px solid #ddd;
-
+        .sentinel-dashboard .panel-body {
+            padding: 22px !important;
         }
 
-
-        .dashboard-card h2 {
-
-            margin-top: 0;
-
-            font-size: 20px;
-
+        .sentinel-dashboard .overview-item,
+        .sentinel-dashboard .quick-action,
+        .sentinel-dashboard .system-status-item {
+            padding: 18px;
         }
+    }
+</style>
 
 
-        .dashboard-number {
+<div class="sentinel-dashboard">
 
-            font-size: 36px;
+    <!-- =====================================================
+         DASHBOARD HEADER
+         ===================================================== -->
 
-            font-weight: bold;
+    <div class="dashboard-hero">
 
-            margin: 15px 0;
-
-        }
-
-
-        .dashboard-label {
-
-            color: #666;
-
-        }
-
-
-        .vulnerability-card {
-
-            background: #fff4f4;
-
-            border-color: #f0cccc;
-
-        }
-
-
-        .target-card {
-
-            background: #f4f6f8;
-
-        }
-
-
-        .dashboard-actions {
-
-            margin-top: 35px;
-
-            text-align: center;
-
-        }
-
-
-        .dashboard-actions a {
-
-            margin-right: 10px;
-
-        }
-
-
-        @media (max-width: 700px) {
-
-            .dashboard-grid {
-
-                grid-template-columns: 1fr;
-
-            }
-
-        }
-
-    </style>
-
-</head>
-
-
-<body>
-
-
-<div class="container">
-
-
-    <!-- HEADER -->
-
-    <div class="dashboard-header">
-
-        <h1>
-            🛡️ Security Dashboard
-        </h1>
+        <h1>Security Dashboard</h1>
 
         <p>
-            Overview of your network security scans
+            Monitor network security assessments, scan activity,
+            vulnerabilities and reporting.
         </p>
 
     </div>
 
 
-    <!-- DASHBOARD CARDS -->
+    <!-- =====================================================
+         STATISTICS
+         ===================================================== -->
 
-    <div class="dashboard-grid">
+    <div class="stats-grid">
 
+        <div class="dashboard-panel stat-card">
 
-        <!-- TOTAL SCANS -->
+            <h3>Total Scans</h3>
 
-        <div class="dashboard-card">
-
-            <h2>
-                🔍 Total Scans
-            </h2>
-
-
-            <div class="dashboard-number">
-
+            <div class="stat-value">
                 {{ total_scans }}
-
             </div>
 
-
-            <div class="dashboard-label">
-
-                Scans performed
-
-            </div>
+            <p>
+                Completed security assessments
+            </p>
 
         </div>
 
 
-        <!-- OPEN PORTS -->
+        <div class="dashboard-panel stat-card">
 
-        <div class="dashboard-card">
+            <h3>Open Ports</h3>
 
-            <h2>
-                🌐 Open Ports
-            </h2>
-
-
-            <div class="dashboard-number">
-
+            <div class="stat-value">
                 {{ total_ports }}
-
             </div>
 
-
-            <div class="dashboard-label">
-
-                Open ports detected
-
-            </div>
+            <p>
+                Ports identified during scans
+            </p>
 
         </div>
 
 
-        <!-- VULNERABILITIES -->
+        <div class="dashboard-panel stat-card">
 
-        <div class="dashboard-card vulnerability-card">
+            <h3>Latest Target</h3>
 
-            <h2>
-                🔎 Vulnerabilities
-            </h2>
-
-
-            <div class="dashboard-number">
-
-                {{ total_vulnerabilities }}
-
-            </div>
-
-
-            <div class="dashboard-label">
-
-                Possible CVE matches
-
-            </div>
-
-        </div>
-
-
-        <!-- LATEST TARGET -->
-
-        <div class="dashboard-card target-card">
-
-            <h2>
-                🎯 Latest Target
-            </h2>
-
-
-            <div class="dashboard-number">
-
+            <div class="stat-value">
                 {{ latest_target }}
-
             </div>
 
+            <p>
+                Most recently scanned target
+            </p>
 
-            <div class="dashboard-label">
+        </div>
 
-                Most recently scanned
+    </div>
+
+
+    <!-- =====================================================
+         SECURITY OVERVIEW
+         ===================================================== -->
+
+    <div class="dashboard-panel">
+
+        <div class="panel-header">
+
+            <h2>Security Overview</h2>
+
+            <p>
+                Current status of your scanning environment.
+            </p>
+
+        </div>
+
+
+        <div class="panel-body">
+
+            <div class="overview-grid">
+
+
+                <div class="overview-item">
+
+                    <h3>
+                        ✓ Nmap Engine
+                    </h3>
+
+                    <p>
+                        Network scanning backend
+                    </p>
+
+                    <br>
+
+                    <span class="ready-badge">
+                        ● Ready
+                    </span>
+
+                </div>
+
+
+                <div class="overview-item">
+
+                    <h3>
+                        ⇩ Report Generator
+                    </h3>
+
+                    <p>
+                        HTML and PDF security reports
+                    </p>
+
+                    <br>
+
+                    <span class="ready-badge">
+                        ● Ready
+                    </span>
+
+                </div>
+
+
+                <div class="overview-item">
+
+                    <h3>
+                        ◉ CVE Intelligence
+                    </h3>
+
+                    <p>
+                        NVD vulnerability lookup
+                    </p>
+
+                    <br>
+
+                    <span class="ready-badge">
+                        ● Ready
+                    </span>
+
+                </div>
+
+
+                <div class="overview-item">
+
+                    <h3>
+                        ⚠ Security Recommendations
+                    </h3>
+
+                    <p>
+                        Review practical recommendations
+                        for improving network security.
+                    </p>
+
+                </div>
+
+
+                <div class="overview-item">
+
+                    <h3>
+                        ◈ Risk Classification
+                    </h3>
+
+                    <p>
+                        Detected services are classified
+                        using basic security risk rules.
+                    </p>
+
+                </div>
+
+
+                <div class="overview-item">
+
+                    <h3>
+                        ◉ Vulnerability Analysis
+                    </h3>
+
+                    <p>
+                        Detected software can be compared
+                        with publicly documented vulnerabilities.
+                    </p>
+
+                </div>
 
             </div>
 
         </div>
 
+    </div>
+
+
+    <!-- =====================================================
+         QUICK ACTIONS
+         ===================================================== -->
+
+    <div class="dashboard-panel">
+
+        <div class="panel-header">
+
+            <h2>Quick Actions</h2>
+
+            <p>
+                Start a security assessment.
+            </p>
+
+        </div>
+
+
+        <div class="panel-body">
+
+            <div class="quick-actions">
+
+
+                <div class="quick-action">
+
+                    <a href="{{ url_for('home') }}">
+
+                        <span class="quick-action-title">
+                            ⌕ New Security Scan
+                        </span>
+
+                        <span class="quick-action-description">
+                            Scan an IP address or domain
+                        </span>
+
+                    </a>
+
+                </div>
+
+
+                <div class="quick-action">
+
+                    <a href="{{ url_for('history') }}">
+
+                        <span class="quick-action-title">
+                            ◷ Scan History
+                        </span>
+
+                        <span class="quick-action-description">
+                            Review previous security assessments
+                        </span>
+
+                    </a>
+
+                </div>
+
+
+                <div class="quick-action">
+
+                    <a href="{{ url_for('download_pdf') }}">
+
+                        <span class="quick-action-title">
+                            ⇩ Download Report
+                        </span>
+
+                        <span class="quick-action-description">
+                            Get the latest PDF security report
+                        </span>
+
+                    </a>
+
+                </div>
+
+
+                <div class="quick-action">
+
+                    <a href="{{ url_for('pentest') }}">
+
+                        <span class="quick-action-title">
+                            ⚡ Penetration Test
+                        </span>
+
+                        <span class="quick-action-description">
+                            Run a safe security assessment
+                        </span>
+
+                    </a>
+
+                </div>
+
+
+            </div>
+
+        </div>
 
     </div>
 
 
-    <!-- INFORMATION -->
+    <!-- =====================================================
+         SYSTEM STATUS
+         ===================================================== -->
 
-    <div class="card">
+    <div class="dashboard-panel">
 
-        <h2>
-            📊 Dashboard Information
-        </h2>
+        <div class="panel-header">
 
+            <h2>System Status</h2>
 
-        <p>
+            <p>
+                Sentinel security platform components.
+            </p>
 
-            <strong>Total Scans:</strong>
-
-            {{ total_scans }}
-
-        </p>
-
-
-        <p>
-
-            <strong>Total Open Ports:</strong>
-
-            {{ total_ports }}
-
-        </p>
+        </div>
 
 
-        <p>
+        <div class="panel-body">
 
-            <strong>Possible CVE Matches:</strong>
-
-            {{ total_vulnerabilities }}
-
-        </p>
+            <div class="system-status-list">
 
 
-        <p>
+                <div class="system-status-item">
 
-            <strong>Latest Target:</strong>
+                    <span class="system-status-name">
+                        Scanner
+                    </span>
 
-            {{ latest_target }}
+                    <span class="ready-badge system-status-state">
+                        ● Operational
+                    </span>
 
-        </p>
-
-
-        <p>
-
-            <strong>Note:</strong>
-
-            CVE matches are based on detected
-            product and version information.
-            They do not confirm that a system
-            is vulnerable.
-
-        </p>
-
-    </div>
+                </div>
 
 
-    <!-- ACTION BUTTONS -->
+                <div class="system-status-item">
 
-    <div class="dashboard-actions">
+                    <span class="system-status-name">
+                        Database
+                    </span>
 
+                    <span class="ready-badge system-status-state">
+                        ● Operational
+                    </span>
 
-        <a
-            href="/"
-            class="button"
-        >
-
-            🔍 New Scan
-
-        </a>
+                </div>
 
 
-        <a
-            href="/history"
-            class="button"
-        >
+                <div class="system-status-item">
 
-            📋 Scan History
+                    <span class="system-status-name">
+                        Report Generator
+                    </span>
 
-        </a>
+                    <span class="ready-badge system-status-state">
+                        ● Operational
+                    </span>
 
+                </div>
+
+
+                <div class="system-status-item">
+
+                    <span class="system-status-name">
+                        CVE Lookup
+                    </span>
+
+                    <span class="ready-badge system-status-state">
+                        ● Available
+                    </span>
+
+                </div>
+
+
+            </div>
+
+        </div>
 
     </div>
 
 
 </div>
 
-
-</body>
-
-</html>
+{% endblock %}

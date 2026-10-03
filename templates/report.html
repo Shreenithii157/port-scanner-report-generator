@@ -1,1059 +1,1167 @@
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-
-    <meta charset="UTF-8">
-
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
-
-    <title>Security Scan Report</title>
-
-    <link rel="stylesheet"
-          href="{{ url_for('static', filename='style.css') }}">
-
-
-    <style>
-
-        /* --------------------------------
-           REPORT HEADER
-        -------------------------------- */
-
-        .report-header {
-
-            text-align: center;
-
-            margin-bottom: 30px;
-
-        }
-
-
-        /* --------------------------------
-           SCAN INFORMATION
-        -------------------------------- */
-
-        .scan-info {
-
-            margin-bottom: 25px;
-
-        }
-
-
-        /* --------------------------------
-           RISK
-        -------------------------------- */
-
-        .risk-high {
-
-            font-weight: bold;
-
-        }
-
-
-        .risk-medium {
-
-            font-weight: bold;
-
-        }
-
-
-        .risk-low {
-
-            font-weight: bold;
-
-        }
-
-
-        /* --------------------------------
-           RISK NOTE
-        -------------------------------- */
-
-        .risk-note {
-
-            margin-top: 20px;
-
-            padding: 15px;
-
-            background: #f4f6f8;
-
-            border-radius: 8px;
-
-        }
-
-
-        /* --------------------------------
-           RECOMMENDATIONS
-        -------------------------------- */
-
-        .recommendations {
-
-            margin-top: 30px;
-
-            padding: 20px;
-
-            background: #f4f6f8;
-
-            border-radius: 8px;
-
-        }
-
-
-        .recommendations li {
-
-            margin-bottom: 12px;
-
-        }
-
-
-        /* --------------------------------
-           ACTION BUTTONS
-        -------------------------------- */
-
-        .action-buttons {
-
-            margin-top: 30px;
-
-        }
-
-
-        /* --------------------------------
-           TARGET BADGE
-        -------------------------------- */
-
-        .target-badge {
-
-            display: inline-block;
-
-            padding: 5px 10px;
-
-            background: #eeeeee;
-
-            border-radius: 5px;
-
-            font-weight: bold;
-
-        }
-
-
-        /* --------------------------------
-           CVE SECTION
-        -------------------------------- */
-
-        .cve-section {
-
-            margin-top: 30px;
-
-            padding: 25px;
-
-            background: #fff5f5;
-
-            border: 1px solid #ffcccc;
-
-            border-radius: 10px;
-
-        }
-
-
-        .cve-section h2 {
-
-            margin-top: 0;
-
-        }
-
-
-        .cve-card {
-
-            margin-top: 20px;
-
-            padding: 20px;
-
-            background: white;
-
-            border: 1px solid #dddddd;
-
-            border-radius: 8px;
-
-        }
-
-
-        .cve-header {
-
-            display: flex;
-
-            justify-content: space-between;
-
-            align-items: center;
-
-            flex-wrap: wrap;
-
-            gap: 10px;
-
-        }
-
-
-        .cve-id {
-
-            font-size: 20px;
-
-            font-weight: bold;
-
-        }
-
-
-        .cve-severity {
-
-            display: inline-block;
-
-            padding: 6px 12px;
-
-            border-radius: 5px;
-
-            font-weight: bold;
-
-            background: #eeeeee;
-
-        }
-
-
-        .severity-critical {
-
-            background: #ffcccc;
-
-            color: #990000;
-
-        }
-
-
-        .severity-high {
-
-            background: #ffd6d6;
-
-            color: #aa0000;
-
-        }
-
-
-        .severity-medium {
-
-            background: #ffe6cc;
-
-            color: #994400;
-
-        }
-
-
-        .severity-low {
-
-            background: #ddf5dd;
-
-            color: #176b17;
-
-        }
-
-
-        .severity-unknown {
-
-            background: #eeeeee;
-
-            color: #555555;
-
-        }
-
-
-        .cve-score {
-
-            margin-top: 12px;
-
-            font-weight: bold;
-
-        }
-
-
-        .cve-description {
-
-            margin-top: 15px;
-
-            line-height: 1.6;
-
-        }
-
-
-        .cve-product {
-
-            margin-top: 12px;
-
-            color: #555555;
-
-        }
-
-
-        .cve-link {
-
-            display: inline-block;
-
-            margin-top: 15px;
-
-            padding: 8px 14px;
-
-            background: #222;
-
-            color: white;
-
-            text-decoration: none;
-
-            border-radius: 5px;
-
-        }
-
-
-        .cve-link:hover {
-
-            opacity: 0.85;
-
-        }
-
-
-        .no-cve {
-
-            margin-top: 15px;
-
-            padding: 20px;
-
-            background: #f4f6f8;
-
-            border-radius: 8px;
-
-        }
-
-    <style>
-        
-        <!-- your existing CSS -->
-    
-    /* your existing styles... */
-
-
-    /* --------------------------------
-       SECURITY SUMMARY
-    --------------------------------- */
-
-    .security-summary {
-        margin-bottom: 30px;
+{% extends "base.html" %}
+
+{% block title %}Security Report | Sentinel Security{% endblock %}
+
+{% block content %}
+
+<style>
+/* =========================================================
+   SENTINEL SECURITY REPORT PAGE
+   ========================================================= */
+
+.report-page {
+    max-width: 1500px;
+    margin: 0 auto;
+}
+
+/* Header */
+.report-hero {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 25px;
+    margin-bottom: 28px;
+}
+
+.report-title-area h1 {
+    margin: 0;
+    font-size: 34px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+}
+
+.report-title-area p {
+    margin: 8px 0 0;
+    color: #7f96b2;
+    font-size: 15px;
+}
+
+.report-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.report-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 11px 16px;
+    border-radius: 8px;
+    border: 1px solid #263750;
+    background: #101b2c;
+    color: #dce8f7;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 700;
+    transition: 0.2s ease;
+}
+
+.report-btn:hover {
+    border-color: #16b9ff;
+    color: #ffffff;
+    transform: translateY(-1px);
+}
+
+.report-btn.primary {
+    background: #0799d7;
+    border-color: #0799d7;
+    color: white;
+}
+
+.report-btn.primary:hover {
+    background: #08a9ec;
+}
+
+/* Status Banner */
+.report-status {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 16px 20px;
+    margin-bottom: 25px;
+    border: 1px solid #173650;
+    border-left: 4px solid #18cfa0;
+    border-radius: 10px;
+    background: linear-gradient(
+        90deg,
+        rgba(14, 42, 62, 0.8),
+        rgba(9, 22, 38, 0.8)
+    );
+}
+
+.report-status-icon {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(24, 207, 160, 0.12);
+    color: #18cfa0;
+    font-size: 18px;
+}
+
+.report-status-title {
+    color: #eef6ff;
+    font-weight: 700;
+    font-size: 14px;
+}
+
+.report-status-text {
+    color: #7f96b2;
+    font-size: 12px;
+    margin-top: 3px;
+}
+
+/* Summary */
+.section-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 30px 0 15px;
+}
+
+.section-title h2 {
+    margin: 0;
+    font-size: 19px;
+    color: #edf5ff;
+}
+
+.section-title-icon {
+    color: #16b9ff;
+    font-size: 20px;
+}
+
+.summary-grid {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 14px;
+}
+
+.summary-card {
+    position: relative;
+    overflow: hidden;
+    padding: 20px;
+    min-height: 125px;
+    border-radius: 12px;
+    border: 1px solid #1d2d44;
+    background: #0d1828;
+}
+
+.summary-card::after {
+    content: "";
+    position: absolute;
+    width: 90px;
+    height: 90px;
+    right: -35px;
+    bottom: -45px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.02);
+}
+
+.summary-icon {
+    font-size: 20px;
+    margin-bottom: 14px;
+}
+
+.summary-number {
+    font-size: 29px;
+    font-weight: 800;
+    line-height: 1;
+    color: #f2f7ff;
+}
+
+.summary-label {
+    margin-top: 8px;
+    color: #7890ad;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.7px;
+}
+
+/* Summary colors */
+.summary-high {
+    border-top: 3px solid #ff526d;
+}
+
+.summary-high .summary-icon {
+    color: #ff526d;
+}
+
+.summary-medium {
+    border-top: 3px solid #ffad4d;
+}
+
+.summary-medium .summary-icon {
+    color: #ffad4d;
+}
+
+.summary-low {
+    border-top: 3px solid #22d69b;
+}
+
+.summary-low .summary-icon {
+    color: #22d69b;
+}
+
+.summary-ports {
+    border-top: 3px solid #20b8ff;
+}
+
+.summary-ports .summary-icon {
+    color: #20b8ff;
+}
+
+.summary-cves {
+    border-top: 3px solid #a879ff;
+}
+
+.summary-cves .summary-icon {
+    color: #a879ff;
+}
+
+/* Scan information */
+.info-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+    gap: 14px;
+    margin-top: 18px;
+}
+
+.info-card {
+    padding: 18px 20px;
+    border: 1px solid #1d2d44;
+    border-radius: 10px;
+    background: #0d1828;
+}
+
+.info-label {
+    color: #6f87a4;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    margin-bottom: 8px;
+}
+
+.info-value {
+    color: #eef6ff;
+    font-size: 16px;
+    font-weight: 700;
+    word-break: break-word;
+}
+
+.info-value.mono {
+    font-family: Consolas, monospace;
+    color: #21c1ff;
+}
+
+/* Main panels */
+.report-panel {
+    margin-top: 24px;
+    border: 1px solid #1d2d44;
+    border-radius: 12px;
+    background: #0b1626;
+    overflow: hidden;
+}
+
+.panel-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    padding: 18px 20px;
+    border-bottom: 1px solid #1d2d44;
+    background: #0e1a2c;
+}
+
+.panel-heading-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.panel-heading h2 {
+    margin: 0;
+    color: #edf5ff;
+    font-size: 17px;
+}
+
+.panel-heading-icon {
+    color: #20b8ff;
+    font-size: 19px;
+}
+
+.panel-count {
+    padding: 5px 9px;
+    border-radius: 20px;
+    background: rgba(32,184,255,0.1);
+    color: #20b8ff;
+    font-size: 11px;
+    font-weight: 800;
+}
+
+/* Table */
+.table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.report-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 850px;
+}
+
+.report-table th {
+    padding: 13px 15px;
+    text-align: left;
+    background: #091322;
+    color: #7894b5;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    border-bottom: 1px solid #1d2d44;
+}
+
+.report-table td {
+    padding: 14px 15px;
+    color: #dce7f4;
+    font-size: 13px;
+    border-bottom: 1px solid #15243a;
+    vertical-align: middle;
+}
+
+.report-table tbody tr:hover {
+    background: rgba(32,184,255,0.035);
+}
+
+.port-number {
+    color: #20b8ff;
+    font-weight: 800;
+    font-family: Consolas, monospace;
+}
+
+.protocol-badge {
+    display: inline-flex;
+    padding: 4px 8px;
+    border-radius: 5px;
+    background: #122338;
+    color: #a9c0d9;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.state-badge {
+    color: #22d69b;
+    font-weight: 700;
+}
+
+.service-name {
+    color: #f0f6ff;
+    font-weight: 700;
+}
+
+.product-text {
+    color: #9db2c9;
+}
+
+.version-text {
+    color: #7f96b2;
+    font-family: Consolas, monospace;
+}
+
+/* Risk badges */
+.risk-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 9px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 800;
+}
+
+.risk-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+}
+
+.risk-high {
+    background: rgba(255,82,109,0.1);
+    color: #ff6b80;
+}
+
+.risk-high .risk-dot {
+    background: #ff526d;
+}
+
+.risk-medium {
+    background: rgba(255,173,77,0.1);
+    color: #ffb866;
+}
+
+.risk-medium .risk-dot {
+    background: #ffad4d;
+}
+
+.risk-low {
+    background: rgba(34,214,155,0.1);
+    color: #35dda8;
+}
+
+.risk-low .risk-dot {
+    background: #22d69b;
+}
+
+/* Empty state */
+.empty-state {
+    text-align: center;
+    padding: 45px 20px;
+    color: #7189a5;
+}
+
+.empty-icon {
+    font-size: 35px;
+    margin-bottom: 10px;
+    opacity: 0.7;
+}
+
+.empty-title {
+    color: #d8e4f2;
+    font-weight: 700;
+    margin-bottom: 5px;
+}
+
+/* Bottom two-column layout */
+.bottom-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+    margin-top: 24px;
+}
+
+/* Recommendations */
+.recommendation-list {
+    padding: 18px 20px;
+}
+
+.recommendation-item {
+    display: flex;
+    gap: 12px;
+    padding: 13px 0;
+    border-bottom: 1px solid #17263a;
+}
+
+.recommendation-item:last-child {
+    border-bottom: none;
+}
+
+.recommendation-icon {
+    flex: 0 0 28px;
+    width: 28px;
+    height: 28px;
+    border-radius: 7px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(32,184,255,0.1);
+    color: #20b8ff;
+    font-size: 13px;
+}
+
+.recommendation-text {
+    color: #b9c9db;
+    font-size: 13px;
+    line-height: 1.55;
+}
+
+/* CVE cards */
+.cve-list {
+    padding: 18px 20px;
+}
+
+.cve-item {
+    padding: 15px;
+    margin-bottom: 10px;
+    border: 1px solid #1d2d44;
+    border-radius: 9px;
+    background: #0d1828;
+}
+
+.cve-item:last-child {
+    margin-bottom: 0;
+}
+
+.cve-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+}
+
+.cve-id {
+    color: #a879ff;
+    font-weight: 800;
+    font-family: Consolas, monospace;
+    font-size: 13px;
+}
+
+.cve-score {
+    color: #f0f6ff;
+    font-size: 11px;
+    font-weight: 800;
+}
+
+.cve-product {
+    margin-top: 7px;
+    color: #b9c9db;
+    font-size: 12px;
+}
+
+.cve-description {
+    margin-top: 8px;
+    color: #7189a5;
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+/* Footer */
+.report-footer {
+    margin-top: 28px;
+    padding: 16px 0 5px;
+    color: #526b87;
+    font-size: 11px;
+    text-align: center;
+}
+
+/* Responsive */
+@media (max-width: 1100px) {
+    .summary-grid {
+        grid-template-columns: repeat(3, 1fr);
     }
 
-    .security-summary h2 {
-        margin-bottom: 20px;
+    .info-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .bottom-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 700px) {
+    .report-hero {
+        flex-direction: column;
     }
 
     .summary-grid {
-        display: grid;
-        grid-template-columns: repeat(5, 1fr);
-        gap: 15px;
+        grid-template-columns: 1fr 1fr;
     }
 
-    .summary-card {
-        padding: 20px;
-        text-align: center;
-        border-radius: 10px;
-        border: 1px solid #dddddd;
-        background: #f8f8f8;
+    .info-grid {
+        grid-template-columns: 1fr;
     }
 
-    .summary-icon {
-        font-size: 28px;
+    .report-title-area h1 {
+        font-size: 27px;
     }
+}
 
-    .summary-number {
-        font-size: 30px;
-        font-weight: bold;
-        margin-top: 8px;
+@media (max-width: 480px) {
+    .summary-grid {
+        grid-template-columns: 1fr;
     }
-
-    .summary-label {
-        margin-top: 5px;
-        font-weight: bold;
-    }
-
-    .high-card {
-        background: #fff0f0;
-    }
-
-    .medium-card {
-        background: #fff5e8;
-    }
-
-    .low-card {
-        background: #effbef;
-    }
-
-    .port-card {
-        background: #eef5ff;
-    }
-
-    .cve-card-summary {
-        background: #f5efff;
-    }
-
-    @media (max-width: 900px) {
-        .summary-grid {
-            grid-template-columns: repeat(2, 1fr);
-        }
-    }
-
-    @media (max-width: 500px) {
-        .summary-grid {
-            grid-template-columns: 1fr;
-        }
-    }
-
+}
 </style>
 
-</head>
 
+<div class="report-page">
 
-<body>
+    <!-- =====================================================
+         REPORT HEADER
+         ===================================================== -->
 
+    <div class="report-hero">
 
-<div class="container">
+        <div class="report-title-area">
 
+            <h1>Security Scan Report</h1>
 
-    <!-- --------------------------------
-         HEADER
-    --------------------------------- -->
+            <p>
+                Network security assessment results generated by Sentinel.
+            </p>
 
-    <div class="report-header">
+        </div>
 
-        <h1>
-            Security Scan Report
-        </h1>
+        <div class="report-actions">
 
-        <p>
-            Network Security Scan Results
-        </p>
+            <a
+                href="{{ url_for('home') }}"
+                class="report-btn"
+            >
+                ← New Scan
+            </a>
+
+            <a
+                href="/history"
+                class="report-btn"
+            >
+                ◷ History
+            </a>
+
+            <a
+                href="{{ url_for('download_pdf') }}"
+                class="report-btn primary"
+            >
+                ⇩ Download PDF
+            </a>
+            <a
+    href="{{ url_for('download_xml') }}"
+    class="report-btn"
+>
+    ⇩ Download XML
+</a>
+
+        </div>
 
     </div>
 
 
-    <!-- --------------------------------
-         SCAN INFORMATION
-    --------------------------------- -->
+    <!-- =====================================================
+         STATUS
+         ===================================================== -->
 
-    <!-- --------------------------------
-     SECURITY SUMMARY
---------------------------------- -->
+    <div class="report-status">
 
-<div class="security-summary">
+        <div class="report-status-icon">
+            ✓
+        </div>
 
-    <h2>
-        🛡️ Security Summary
-    </h2>
+        <div>
+
+            <div class="report-status-title">
+                Security assessment completed
+            </div>
+
+            <div class="report-status-text">
+                Nmap scan results have been analyzed and classified.
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         SECURITY SUMMARY
+         ===================================================== -->
+
+    <div class="section-title">
+
+        <span class="section-title-icon">◈</span>
+
+        <h2>Security Summary</h2>
+
+    </div>
+
 
     <div class="summary-grid">
 
-        <div class="summary-card high-card">
-            <div class="summary-icon">🔴</div>
-            <div class="summary-number">
-                {{ summary.get("high", 0) }}
+        <!-- HIGH -->
+        <div class="summary-card summary-high">
+
+            <div class="summary-icon">
+                ●
             </div>
+
+            <div class="summary-number">
+                {{ summary.high }}
+            </div>
+
             <div class="summary-label">
                 High Risk
             </div>
+
         </div>
 
-        <div class="summary-card medium-card">
-            <div class="summary-icon">🟠</div>
-            <div class="summary-number">
-                {{ summary.get("medium", 0) }}
+
+        <!-- MEDIUM -->
+        <div class="summary-card summary-medium">
+
+            <div class="summary-icon">
+                ●
             </div>
+
+            <div class="summary-number">
+                {{ summary.medium }}
+            </div>
+
             <div class="summary-label">
                 Medium Risk
             </div>
+
         </div>
 
-        <div class="summary-card low-card">
-            <div class="summary-icon">🟢</div>
-            <div class="summary-number">
-                {{ summary.get("low", 0) }}
+
+        <!-- LOW -->
+        <div class="summary-card summary-low">
+
+            <div class="summary-icon">
+                ●
             </div>
+
+            <div class="summary-number">
+                {{ summary.low }}
+            </div>
+
             <div class="summary-label">
                 Low Risk
             </div>
+
         </div>
 
-        <div class="summary-card port-card">
-            <div class="summary-icon">🌐</div>
-            <div class="summary-number">
-                {{ summary.get("ports", 0) }}
+
+        <!-- OPEN PORTS -->
+        <div class="summary-card summary-ports">
+
+            <div class="summary-icon">
+                ◎
             </div>
+
+            <div class="summary-number">
+                {{ summary.ports }}
+            </div>
+
             <div class="summary-label">
                 Open Ports
             </div>
+
         </div>
 
-        <div class="summary-card cve-card-summary">
-            <div class="summary-icon">🔎</div>
-            <div class="summary-number">
-                {{ summary.get("cves", 0) }}
+
+        <!-- CVE -->
+        <div class="summary-card summary-cves">
+
+            <div class="summary-icon">
+                ⌕
             </div>
+
+            <div class="summary-number">
+                {{ summary.cves }}
+            </div>
+
             <div class="summary-label">
                 CVE Matches
             </div>
+
         </div>
 
     </div>
 
-</div>
-<div class="scan-info">
 
-        <p>
+    <!-- =====================================================
+         SCAN INFORMATION
+         ===================================================== -->
 
-            <strong>Target(s):</strong>
+    <div class="info-grid">
 
-            {{ target }}
+        <div class="info-card">
 
-        </p>
-        <p>
-    <strong>Scan Date:</strong>
+            <div class="info-label">
+                Target
+            </div>
 
-    {{ scan_date }}
+            <div class="info-value mono">
+                {{ target }}
+            </div>
 
-</p>
+        </div>
 
 
-        <p>
+        <div class="info-card">
 
-            <strong>Scan Duration:</strong>
+            <div class="info-label">
+                Scan Duration
+            </div>
 
-            {{ duration }} seconds
+            <div class="info-value">
+                {{ duration }} seconds
+            </div>
 
-        </p>
+        </div>
+
+
+        <div class="info-card">
+
+            <div class="info-label">
+                Assessment
+            </div>
+
+            <div class="info-value">
+                Completed
+            </div>
+
+        </div>
 
     </div>
 
 
-    <!-- --------------------------------
+    <!-- =====================================================
          OPEN PORTS
-    --------------------------------- -->
+         ===================================================== -->
 
-    <h2>
-        Open Ports
-    </h2>
+    <div class="report-panel">
 
+        <div class="panel-heading">
 
-    {% if results %}
+            <div class="panel-heading-left">
 
+                <span class="panel-heading-icon">
+                    ◫
+                </span>
 
-    <table>
+                <h2>
+                    Open Ports & Services
+                </h2>
 
-        <thead>
+            </div>
 
-            <tr>
+            <span class="panel-count">
+                {{ results|length }} DETECTED
+            </span>
 
-                <th>Target</th>
+        </div>
 
-                <th>Port</th>
 
-                <th>Protocol</th>
+        {% if results %}
 
-                <th>State</th>
+        <div class="table-wrapper">
 
-                <th>Service</th>
+            <table class="report-table">
 
-                <th>Product</th>
+                <thead>
 
-                <th>Version</th>
+                    <tr>
 
-                <th>Risk</th>
+                        <th>Port</th>
+                        <th>Protocol</th>
+                        <th>State</th>
+                        <th>Service</th>
+                        <th>Product</th>
+                        <th>Version</th>
+                        <th>Risk</th>
 
-            </tr>
+                    </tr>
 
-        </thead>
+                </thead>
 
 
-        <tbody>
+                <tbody>
 
+                    {% for result in results %}
 
-            {% for result in results %}
+                    <tr>
 
+                        <td>
+                            <span class="port-number">
+                                {{ result.port }}
+                            </span>
+                        </td>
 
-            <tr>
 
+                        <td>
 
-                <!-- TARGET -->
+                            <span class="protocol-badge">
+                                {{ result.protocol }}
+                            </span>
 
-                <td>
+                        </td>
 
-                    <span class="target-badge">
 
-                        {{ result.get("target", target) }}
+                        <td>
 
-                    </span>
+                            <span class="state-badge">
+                                ● {{ result.state }}
+                            </span>
 
-                </td>
+                        </td>
 
 
-                <!-- PORT -->
+                        <td>
 
-                <td>
-                    {{ result["port"] }}
-                </td>
+                            <span class="service-name">
+                                {{ result.service or "Unknown" }}
+                            </span>
 
+                        </td>
 
-                <!-- PROTOCOL -->
 
-                <td>
-                    {{ result["protocol"] }}
-                </td>
+                        <td>
 
+                            <span class="product-text">
+                                {{ result.product or "—" }}
+                            </span>
 
-                <!-- STATE -->
+                        </td>
 
-                <td>
-                    {{ result["state"] }}
-                </td>
 
+                        <td>
 
-                <!-- SERVICE -->
+                            <span class="version-text">
+                                {{ result.version or "—" }}
+                            </span>
 
-                <td>
-                    {{ result["service"] }}
-                </td>
+                        </td>
 
 
-                <!-- PRODUCT -->
+                        <td>
 
-                <td>
-                    {{ result["product"] }}
-                </td>
+                            {% if result.risk == "High" %}
 
+                            <span class="risk-badge risk-high">
+                                <span class="risk-dot"></span>
+                                High
+                            </span>
 
-                <!-- VERSION -->
+                            {% elif result.risk == "Medium" %}
 
-                <td>
-                    {{ result["version"] }}
-                </td>
+                            <span class="risk-badge risk-medium">
+                                <span class="risk-dot"></span>
+                                Medium
+                            </span>
 
+                            {% else %}
 
-                <!-- RISK -->
+                            <span class="risk-badge risk-low">
+                                <span class="risk-dot"></span>
+                                Low
+                            </span>
 
-                <td>
+                            {% endif %}
 
+                        </td>
 
-                    {% if result["risk"] == "High" %}
+                    </tr>
 
-                        <span class="risk-high">
+                    {% endfor %}
 
-                            🔴 High
+                </tbody>
 
-                        </span>
+            </table>
 
+        </div>
 
-                    {% elif result["risk"] == "Medium" %}
+        {% else %}
 
-                        <span class="risk-medium">
+        <div class="empty-state">
 
-                            🟠 Medium
+            <div class="empty-icon">
+                ◎
+            </div>
 
-                        </span>
+            <div class="empty-title">
+                No open ports detected
+            </div>
 
+            <div>
+                Nmap did not return any open port results.
+            </div>
 
-                    {% else %}
+        </div>
 
-                        <span class="risk-low">
-
-                            🟢 Low
-
-                        </span>
-
-                    {% endif %}
-
-
-                </td>
-
-
-            </tr>
-
-
-            {% endfor %}
-
-
-        </tbody>
-
-    </table>
-
-
-    {% else %}
-
-
-    <div class="card">
-
-        <h3>
-            No Open Ports Detected
-        </h3>
-
-        <p>
-            No open ports were found during the scan.
-        </p>
+        {% endif %}
 
     </div>
 
 
-    {% endif %}
+    <!-- =====================================================
+         RECOMMENDATIONS + CVE
+         ===================================================== -->
+
+    <div class="bottom-grid">
 
 
-    <!-- --------------------------------
-         RISK CLASSIFICATION
-    --------------------------------- -->
+        <!-- SECURITY RECOMMENDATIONS -->
 
-    <div class="risk-note">
+        <div class="report-panel">
 
-        <h3>
-            🛡️ Risk Classification
-        </h3>
+            <div class="panel-heading">
 
+                <div class="panel-heading-left">
 
-        <p>
-
-            <strong>🔴 High:</strong>
-
-            Ports or services that commonly require
-            additional security controls.
-
-        </p>
-
-
-        <p>
-
-            <strong>🟠 Medium:</strong>
-
-            Services that should be reviewed and
-            appropriately secured.
-
-        </p>
-
-
-        <p>
-
-            <strong>🟢 Low:</strong>
-
-            Ports that are not classified as high
-            or medium risk by this basic scanner.
-
-        </p>
-
-
-        <p>
-
-            <strong>Note:</strong>
-
-            This classification is a basic
-            project-level assessment. It does not
-            confirm that a system is vulnerable.
-
-        </p>
-
-    </div>
-
-
-    <!-- --------------------------------
-         CVE / VULNERABILITY LOOKUP
-    --------------------------------- -->
-
-    <div class="cve-section">
-
-        <h2>
-            🔎 Vulnerability / CVE Lookup
-        </h2>
-
-
-        <p>
-
-            Possible vulnerabilities identified
-            from the detected product and version.
-
-        </p>
-
-
-        {% if vulnerabilities %}
-
-
-            {% for vulnerability in vulnerabilities %}
-
-
-            <div class="cve-card">
-
-
-                <!-- CVE HEADER -->
-
-                <div class="cve-header">
-
-
-                    <span class="cve-id">
-
-                        {{ vulnerability["id"] }}
-
+                    <span class="panel-heading-icon">
+                        ⚠
                     </span>
 
-
-                    {% set severity =
-                        vulnerability["severity"] | default("Unknown") | upper
-                    %}
-
-
-                    {% if severity == "CRITICAL" %}
-
-                        <span class="cve-severity severity-critical">
-
-                            🔴 Critical
-
-                        </span>
-
-
-                    {% elif severity == "HIGH" %}
-
-                        <span class="cve-severity severity-high">
-
-                            🔴 High
-
-                        </span>
-
-
-                    {% elif severity == "MEDIUM" %}
-
-                        <span class="cve-severity severity-medium">
-
-                            🟠 Medium
-
-                        </span>
-
-
-                    {% elif severity == "LOW" %}
-
-                        <span class="cve-severity severity-low">
-
-                            🟢 Low
-
-                        </span>
-
-
-                    {% else %}
-
-                        <span class="cve-severity severity-unknown">
-
-                            ⚪ Unknown
-
-                        </span>
-
-                    {% endif %}
-
+                    <h2>
+                        Security Recommendations
+                    </h2>
 
                 </div>
 
-
-                <!-- PRODUCT -->
-
-                {% if vulnerability.get("product") %}
-
-                <p class="cve-product">
-
-                    <strong>Product:</strong>
-
-                    {{ vulnerability["product"] }}
+            </div>
 
 
-                    {% if vulnerability.get("version") %}
+            <div class="recommendation-list">
 
-                        {{ vulnerability["version"] }}
+                {% if recommendations %}
 
-                    {% endif %}
+                    {% for recommendation in recommendations %}
 
-                </p>
+                    <div class="recommendation-item">
+
+                        <div class="recommendation-icon">
+                            ✓
+                        </div>
+
+                        <div class="recommendation-text">
+                            {{ recommendation }}
+                        </div>
+
+                    </div>
+
+                    {% endfor %}
+
+                {% else %}
+
+                    <div class="empty-state">
+
+                        <div class="empty-icon">
+                            ✓
+                        </div>
+
+                        <div class="empty-title">
+                            No specific recommendations
+                        </div>
+
+                        <div>
+                            No additional recommendations were generated.
+                        </div>
+
+                    </div>
 
                 {% endif %}
 
+            </div>
 
-                <!-- SCORE -->
-
-                <p class="cve-score">
-
-                    <strong>CVSS Score:</strong>
-
-                    {% if vulnerability.get("score") is not none %}
-
-                        {{ vulnerability["score"] }}
-
-                    {% else %}
-
-                        Not available
-
-                    {% endif %}
-
-                </p>
+        </div>
 
 
-                <!-- DESCRIPTION -->
+        <!-- CVE INTELLIGENCE -->
 
-                <div class="cve-description">
+        <div class="report-panel">
 
-                    <strong>Description:</strong>
+            <div class="panel-heading">
 
+                <div class="panel-heading-left">
 
-                    <p>
+                    <span class="panel-heading-icon">
+                        ◉
+                    </span>
 
-                        {{ vulnerability.get(
-                            "description",
-                            "No description available."
-                        ) }}
-
-                    </p>
+                    <h2>
+                        CVE Intelligence
+                    </h2>
 
                 </div>
 
-
-                <!-- NVD LINK -->
-
-                <a
-
-                    href="https://nvd.nist.gov/vuln/detail/{{ vulnerability['id'] }}"
-
-                    target="_blank"
-
-                    class="cve-link"
-
-                >
-
-                    🔗 View on NVD
-
-                </a>
-
+                <span class="panel-count">
+                    {{ cves|length }} MATCHES
+                </span>
 
             </div>
 
 
-            {% endfor %}
+            <div class="cve-list">
+
+                {% if cves %}
+
+                    {% for cve in cves %}
+
+                    <div class="cve-item">
+
+                        <div class="cve-top">
+
+                            <span class="cve-id">
+                                {{ cve.id }}
+                            </span>
+
+                            <span class="cve-score">
+                                CVSS: {{ cve.score or "N/A" }}
+                            </span>
+
+                        </div>
 
 
-        {% else %}
+                        <div class="cve-product">
+
+                            {{ cve.product or "Unknown Product" }}
+
+                            {% if cve.version %}
+                                {{ cve.version }}
+                            {% endif %}
+
+                        </div>
 
 
-            <div class="no-cve">
+                        {% if cve.description %}
 
-                <h3>
-                    No matching CVEs found.
-                </h3>
+                        <div class="cve-description">
 
+                            {{ cve.description }}
 
-                <p>
+                        </div>
 
-                    No matching vulnerability information
-                    was returned for the detected products.
+                        {% endif %}
 
-                </p>
+                    </div>
+
+                    {% endfor %}
+
+                {% else %}
+
+                    <div class="empty-state">
+
+                        <div class="empty-icon">
+                            ✓
+                        </div>
+
+                        <div class="empty-title">
+                            No CVE matches
+                        </div>
+
+                        <div>
+                            No possible CVE matches were returned for this scan.
+                        </div>
+
+                    </div>
+
+                {% endif %}
 
             </div>
 
-
-        {% endif %}
-
-
-        <p>
-
-            <strong>Note:</strong>
-
-            CVE matches are possible matches based on
-            detected product and version information.
-            They do not confirm that the scanned system
-            is vulnerable.
-
-        </p>
+        </div>
 
     </div>
 
 
-    <!-- --------------------------------
-         SECURITY RECOMMENDATIONS
-    --------------------------------- -->
+    <!-- =====================================================
+         FOOTER
+         ===================================================== -->
 
-    <div class="recommendations">
+    <div class="report-footer">
 
-        <h2>
-            🛡️ Security Recommendations
-        </h2>
-
-
-        {% if recommendations %}
-
-
-        <ul>
-
-            {% for recommendation in recommendations %}
-
-            <li>
-
-                {{ recommendation }}
-
-            </li>
-
-            {% endfor %}
-
-        </ul>
-
-
-        {% else %}
-
-
-        <p>
-            No specific recommendations were generated.
-        </p>
-
-
-        {% endif %}
-
+        Sentinel Security Platform · Network Security Assessment Report
 
     </div>
-
-
-    <!-- --------------------------------
-         ACTION BUTTONS
-    --------------------------------- -->
-
-    <div class="action-buttons">
-
-
-        <a href="/" class="button">
-
-            🔍 Start New Scan
-
-        </a>
-
-
-        <a href="/history" class="button">
-
-            📋 Scan History
-
-        </a>
-
-
-        <a href="/dashboard" class="button">
-
-            🛡️ Dashboard
-
-        </a>
-
-
-        <a href="/download-pdf" class="button">
-
-            📄 Download PDF Report
-
-        </a>
-
-
-    </div>
-
 
 </div>
 
-
-</body>
-
-</html>
+{% endblock %}

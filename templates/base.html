@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>
+        {% block title %}Sentinel Security{% endblock %}
+    </title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+
+</head>
+
+<body>
+
+<div class="app-shell">
+
+    <!-- ================= SIDEBAR ================= -->
+
+    <aside class="sidebar">
+
+        <div class="brand">
+
+            <div class="brand-icon">
+                ◈
+            </div>
+
+            <div class="brand-text">
+
+                <div class="brand-name">
+                    SENTINEL
+                </div>
+
+                <div class="brand-subtitle">
+                    SECURITY PLATFORM
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <nav class="sidebar-nav">
+
+            <div class="nav-section-title">
+                OVERVIEW
+            </div>
+
+            <a href="{{ url_for('dashboard') }}"
+               class="nav-item">
+
+                <span class="nav-icon">▦</span>
+                <span>Dashboard</span>
+
+            </a>
+
+
+            <div class="nav-section-title">
+                SECURITY
+            </div>
+
+            <a href="{{ url_for('home') }}"
+               class="nav-item">
+
+                <span class="nav-icon">⌕</span>
+                <span>New Scan</span>
+
+            </a>
+
+
+            <a href="/history"
+               class="nav-item">
+
+                <span class="nav-icon">◷</span>
+                <span>Scan History</span>
+
+            </a>
+
+
+            <a href="#"
+               class="nav-item">
+
+                <span class="nav-icon">⚠</span>
+                <span>Vulnerabilities</span>
+
+            </a>
+
+
+            <a href="#"
+               class="nav-item">
+
+                <span class="nav-icon">◎</span>
+                <span>CVE Intelligence</span>
+
+            </a>
+
+
+            <div class="nav-section-title">
+                ASSESSMENT
+            </div>
+
+
+            <a href="{{ url_for('pentest') }}" class="nav-item">
+                 <span class="nav-icon">⌁</span>
+                        <span>Pentest</span>
+            </a>
+
+
+            <a href="{{ url_for('download_pdf') }}"
+               class="nav-item">
+
+                <span class="nav-icon">⇩</span>
+                <span>Latest Report</span>
+
+            </a>
+
+        </nav>
+
+
+        <!-- SYSTEM STATUS -->
+
+        <div class="sidebar-bottom">
+
+            <div class="system-status">
+
+                <span class="status-dot"></span>
+
+                <div>
+
+                    <div class="status-title">
+                        System Online
+                    </div>
+
+                    <div class="status-subtitle">
+                        Scanner operational
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </aside>
+
+
+    <!-- ================= MAIN CONTENT ================= -->
+
+    <main class="main-content">
+
+
+        <!-- TOP BAR -->
+
+        <header class="topbar">
+
+            <div>
+
+                <div class="topbar-title">
+                    Security Operations
+                </div>
+
+                <div class="topbar-subtitle">
+                    Network Security Assessment Platform
+                </div>
+
+            </div>
+
+
+            <div class="topbar-actions">
+
+
+                <div class="connection-status">
+
+                    <span class="status-dot"></span>
+
+                    ONLINE
+
+                </div>
+
+
+                <div class="user-profile">
+
+                    <div class="user-avatar">
+
+                        {{ session.get("username", "A")[0]|upper }}
+
+                    </div>
+
+
+                    <div class="user-info">
+
+                        <span class="user-name">
+
+                            {{ session.get("username", "Administrator") }}
+
+                        </span>
+
+                        <span class="user-role">
+
+                            Security Analyst
+
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <a href="{{ url_for('logout') }}"
+                   class="logout-link">
+
+                    Logout
+
+                </a>
+
+            </div>
+
+        </header>
+
+
+        <!-- PAGE CONTENT -->
+
+        <section class="page-content">
+
+            {% block content %}
+
+            {% endblock %}
+
+        </section>
+
+
+    </main>
+
+</div>
+
+
+{% block scripts %}
+
+{% endblock %}
+
+</body>
+
+</html>

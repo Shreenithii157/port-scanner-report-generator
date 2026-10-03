@@ -5,36 +5,54 @@ from datetime import datetime
 DATABASE = "database/scans.db"
 
 
-# --------------------------------
+# ---------------------------------------------------------
 # DATABASE CONNECTION
-# --------------------------------
+# ---------------------------------------------------------
 
 def get_connection():
-
     conn = sqlite3.connect(DATABASE)
-
     conn.row_factory = sqlite3.Row
-
     return conn
 
 
-# --------------------------------
+# ---------------------------------------------------------
 # INITIALIZE DATABASE
-# --------------------------------
+# ---------------------------------------------------------
 
 def init_db():
 
     conn = get_connection()
+
+    # -----------------------------------------------------
+    # USERS TABLE
+    # -----------------------------------------------------
+
+    conn.execute("""
+        CREATE TABLE IF NOT EXISTS users (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            username TEXT NOT NULL UNIQUE,
+            email TEXT NOT NULL UNIQUE,
+            password_hash TEXT NOT NULL,
+            created_at TEXT NOT NULL
+        )
+    """)
+
+    # -----------------------------------------------------
+    # SCANS TABLE
+    # -----------------------------------------------------
 
     conn.execute("""
         CREATE TABLE IF NOT EXISTS scans (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             target TEXT NOT NULL,
             scan_date TEXT NOT NULL,
-            duration REAL,
-            cve_count INTEGER DEFAULT 0
+            duration REAL
         )
     """)
+
+    # -----------------------------------------------------
+    # PORTS TABLE
+    # -----------------------------------------------------
 
     conn.execute("""
         CREATE TABLE IF NOT EXISTS ports (
@@ -46,45 +64,105 @@ def init_db():
             service TEXT,
             product TEXT,
             version TEXT,
-            FOREIGN KEY (scan_id) REFERENCES scans(id)
+            FOREIGN KEY (scan_id)
+                REFERENCES scans(id)
         )
     """)
 
-    # --------------------------------
-    # ADD CVE COLUMN TO OLD DATABASE
-    # --------------------------------
-
-    columns = conn.execute(
-        "PRAGMA table_info(scans)"
-    ).fetchall()
-
-    column_names = [
-        column["name"]
-        for column in columns
-    ]
-
-    if "cve_count" not in column_names:
-
-        conn.execute("""
-            ALTER TABLE scans
-            ADD COLUMN cve_count INTEGER DEFAULT 0
-        """)
-
     conn.commit()
-
     conn.close()
 
 
-# --------------------------------
-# SAVE SCAN
-# --------------------------------
+# ---------------------------------------------------------
+# USER AUTHENTICATION
+# ---------------------------------------------------------
 
-def save_scan(
-    target,
-    duration,
-    results,
-    cve_count=0
-):
+def create_user(username, email, password_hash):
+
+    conn = get_connection()
+
+    try:
+
+        cursor = conn.execute(
+            """
+            INSERT INTO users
+            (username, email, password_hash, created_at)
+            VALUES (?, ?, ?, ?)
+            """,
+            (
+                username,
+                email,
+                password_hash,
+                datetime.now().strftime(
+                    "%Y-%m-%d %H:%M:%S"
+                )
+            )
+        )
+
+        conn.commit()
+
+        return cursor.lastrowid
+
+    except sqlite3.IntegrityError:
+
+        return None
+
+    finally:
+
+        conn.close()
+
+
+def get_user_by_username(username):
+
+    conn = get_connection()
+
+    user = conn.execute(
+        """
+        SELECT
+            id,
+            username,
+            email,
+            password_hash,
+            created_at
+        FROM users
+        WHERE username = ?
+        """,
+        (username,)
+    ).fetchone()
+
+    conn.close()
+
+    return user
+
+
+def get_user_by_email(email):
+
+    conn = get_connection()
+
+    user = conn.execute(
+        """
+        SELECT
+            id,
+            username,
+            email,
+            password_hash,
+            created_at
+        FROM users
+        WHERE email = ?
+        """,
+        (email,)
+    ).fetchone()
+
+    conn.close()
+
+    return user
+
+
+# ---------------------------------------------------------
+# SAVE SCAN
+# ---------------------------------------------------------
+
+def save_scan(target, duration, results):
 
     conn = get_connection()
 
@@ -95,27 +173,17 @@ def save_scan(
     cursor = conn.execute(
         """
         INSERT INTO scans
-        (
-            target,
-            scan_date,
-            duration,
-            cve_count
-        )
-        VALUES (?, ?, ?, ?)
+        (target, scan_date, duration)
+        VALUES (?, ?, ?)
         """,
         (
             target,
             scan_date,
-            duration,
-            cve_count
+            duration
         )
     )
 
     scan_id = cursor.lastrowid
-
-    # --------------------------------
-    # SAVE PORT RESULTS
-    # --------------------------------
 
     for result in results:
 
@@ -145,15 +213,14 @@ def save_scan(
         )
 
     conn.commit()
-
     conn.close()
 
     return scan_id
 
 
-# --------------------------------
-# GET SCAN HISTORY
-# --------------------------------
+# ---------------------------------------------------------
+# SCAN HISTORY
+# ---------------------------------------------------------
 
 def get_scan_history():
 
@@ -165,8 +232,7 @@ def get_scan_history():
             id,
             target,
             scan_date,
-            duration,
-            cve_count
+            duration
         FROM scans
         ORDER BY id DESC
         """
@@ -177,48 +243,21 @@ def get_scan_history():
     return scans
 
 
-# --------------------------------
-# GET DASHBOARD DATA
-# --------------------------------
+# ---------------------------------------------------------
+# DASHBOARD DATA
+# ---------------------------------------------------------
 
 def get_dashboard_data():
 
     conn = get_connection()
 
-    # Total scans
-
     total_scans = conn.execute(
-        """
-        SELECT COUNT(*)
-        FROM scans
-        """
+        "SELECT COUNT(*) FROM scans"
     ).fetchone()[0]
-
-
-    # Total open ports
 
     total_ports = conn.execute(
-        """
-        SELECT COUNT(*)
-        FROM ports
-        """
+        "SELECT COUNT(*) FROM ports"
     ).fetchone()[0]
-
-
-    # Total CVE matches
-
-    total_vulnerabilities = conn.execute(
-        """
-        SELECT COALESCE(
-            SUM(cve_count),
-            0
-        )
-        FROM scans
-        """
-    ).fetchone()[0]
-
-
-    # Latest target
 
     latest = conn.execute(
         """
@@ -229,30 +268,24 @@ def get_dashboard_data():
         """
     ).fetchone()
 
-
-    if latest:
-
-        latest_target = latest["target"]
-
-    else:
-
-        latest_target = "No scans yet"
-
+    latest_target = (
+        latest["target"]
+        if latest
+        else "No scans yet"
+    )
 
     conn.close()
-
 
     return (
         total_scans,
         total_ports,
-        total_vulnerabilities,
         latest_target
     )
 
 
-# --------------------------------
-# GET INDIVIDUAL SCAN
-# --------------------------------
+# ---------------------------------------------------------
+# GET SINGLE SCAN
+# ---------------------------------------------------------
 
 def get_scan_by_id(scan_id):
 
@@ -264,8 +297,7 @@ def get_scan_by_id(scan_id):
             id,
             target,
             scan_date,
-            duration,
-            cve_count
+            duration
         FROM scans
         WHERE id = ?
         """,
@@ -277,9 +309,9 @@ def get_scan_by_id(scan_id):
     return scan
 
 
-# --------------------------------
-# GET PORTS FOR A SCAN
-# --------------------------------
+# ---------------------------------------------------------
+# GET PORTS FOR SCAN
+# ---------------------------------------------------------
 
 def get_ports_by_scan_id(scan_id):
 
